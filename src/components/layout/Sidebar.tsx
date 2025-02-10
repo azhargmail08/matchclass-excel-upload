@@ -1,5 +1,5 @@
 
-import { ChevronDown, GraduationCap, BookOpen } from "lucide-react";
+import { ArrowDown, ArrowRight, GraduationCap, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -21,11 +21,11 @@ export const Sidebar = () => {
               <GraduationCap className="h-5 w-5 mr-2" />
               <span>Manage</span>
             </div>
-            <ChevronDown
-              className={`h-4 w-4 transition-transform ${
-                isManageOpen ? "transform rotate-180" : ""
-              }`}
-            />
+            {isManageOpen ? (
+              <ArrowDown className="h-4 w-4" />
+            ) : (
+              <ArrowRight className="h-4 w-4" />
+            )}
           </button>
           {isManageOpen && (
             <div className="ml-6 mt-2">
