@@ -14,7 +14,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
-      <Card className="w-full md:w-8/12 lg:w-2/3 max-w-3xl p-6 space-y-8 bg-white shadow-sm border-0">
+      <Card className="w-full md:w-8/12 lg:w-2/3 max-w-2xl p-6 space-y-8 bg-white shadow-sm border-0">
         <div className="flex justify-center">
           <img 
             src="https://admin.studentqr.com/images/logo-my.png" 
