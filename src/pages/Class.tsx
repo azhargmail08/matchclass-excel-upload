@@ -26,8 +26,21 @@ const Class = () => {
   return (
     <div className="p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">{className}</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Classes</h1>
+          <p className="text-gray-600 mb-2">
+            This Page Is Where You Manage Your Own Classes
+          </p>
+          <p className="text-gray-600 mb-2">
+            Such As Add Class, Transfer Student And Assign Teacher
+          </p>
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-6">
+            <p className="text-sm text-gray-700">
+              <span className="font-bold">Notes:</span> For Any Newly Created Records And Updates, 
+              It Will May Take Up To 30 Minutes Before It Reflected In The Apps. 
+              Kindly Click Refresh Data To Check (Android + IOS)
+            </p>
+          </div>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6">
