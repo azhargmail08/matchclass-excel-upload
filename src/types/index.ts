@@ -16,3 +16,17 @@ export interface MatchResult {
   matches: Student[];
   selected?: Student;
 }
+
+export interface StudentChange {
+  id: string;
+  student_id: string;
+  old_name: string;
+  old_class: string;
+  old_nickname?: string;
+  new_name: string;
+  new_class: string;
+  new_nickname?: string;
+  created_at: string;
+  status: 'pending' | 'applied' | 'rolled_back';
+  batch_id: string;
+}

@@ -27,6 +27,56 @@ export type Database = {
         }
         Relationships: []
       }
+      student_changes: {
+        Row: {
+          batch_id: string
+          created_at: string
+          id: string
+          new_class: string
+          new_name: string
+          new_nickname: string | null
+          old_class: string
+          old_name: string
+          old_nickname: string | null
+          status: string | null
+          student_id: string | null
+        }
+        Insert: {
+          batch_id?: string
+          created_at?: string
+          id?: string
+          new_class: string
+          new_name: string
+          new_nickname?: string | null
+          old_class: string
+          old_name: string
+          old_nickname?: string | null
+          status?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          id?: string
+          new_class?: string
+          new_name?: string
+          new_nickname?: string | null
+          old_class?: string
+          old_name?: string
+          old_nickname?: string | null
+          status?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_changes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       students: {
         Row: {
           class: string

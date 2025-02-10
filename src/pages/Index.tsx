@@ -2,21 +2,24 @@
 import { useState, useEffect } from "react";
 import { ExcelUploader } from "@/components/ExcelUploader";
 import { DataMatcher } from "@/components/DataMatcher";
-import { ExcelRow, MatchResult, Student } from "@/types";
+import { ExcelRow, MatchResult, Student, StudentChange } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { RotateCcw } from "lucide-react";
 
 const Index = () => {
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [showMatcher, setShowMatcher] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
+  const [latestBatchId, setLatestBatchId] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchStudents();
+    fetchLatestBatch();
   }, []);
 
   const fetchStudents = async () => {
@@ -39,6 +42,18 @@ const Index = () => {
     }
   };
 
+  const fetchLatestBatch = async () => {
+    const { data, error } = await supabase
+      .from('student_changes')
+      .select('batch_id')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (!error && data && data.length > 0) {
+      setLatestBatchId(data[0].batch_id);
+    }
+  };
+
   const findMatches = (data: ExcelRow[]): MatchResult[] => {
     return data.map((row) => ({
       excelRow: row,
@@ -56,14 +71,78 @@ const Index = () => {
     setShowMatcher(true);
   };
 
-  const handleConfirm = (selectedMatches: MatchResult[]) => {
+  const handleConfirm = async (selectedMatches: MatchResult[]) => {
     console.log("Selected matches:", selectedMatches);
-    toast({
-      title: "Success",
-      description: "Data has been processed successfully",
-    });
     setShowMatcher(false);
     setMatches([]);
+    await fetchStudents();
+    await fetchLatestBatch();
+  };
+
+  const handleRollback = async () => {
+    if (!latestBatchId) {
+      toast({
+        title: "Info",
+        description: "No changes to roll back",
+      });
+      return;
+    }
+
+    try {
+      // Get the changes for the latest batch
+      const { data: changes, error: fetchError } = await supabase
+        .from('student_changes')
+        .select('*')
+        .eq('batch_id', latestBatchId)
+        .eq('status', 'pending');
+
+      if (fetchError) throw fetchError;
+      if (!changes || changes.length === 0) {
+        toast({
+          title: "Info",
+          description: "No pending changes to roll back",
+        });
+        return;
+      }
+
+      // Rollback each change
+      for (const change of changes) {
+        // Update student record back to original values
+        const { error: updateError } = await supabase
+          .from('students')
+          .update({
+            name: change.old_name,
+            class: change.old_class,
+            nickname: change.old_nickname,
+          })
+          .eq('id', change.student_id);
+
+        if (updateError) throw updateError;
+
+        // Update change status
+        const { error: statusError } = await supabase
+          .from('student_changes')
+          .update({ status: 'rolled_back' })
+          .eq('id', change.id);
+
+        if (statusError) throw statusError;
+      }
+
+      toast({
+        title: "Success",
+        description: "Changes have been rolled back successfully",
+      });
+
+      await fetchStudents();
+      await fetchLatestBatch();
+    } catch (error) {
+      console.error('Error rolling back changes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to roll back changes",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleLogout = async () => {
@@ -75,14 +154,24 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="container mx-auto px-4 py-8 flex-grow">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">
               Excel Data Verification
             </h1>
-            <p className="text-gray-600 text-center">
-              Upload your Excel file to verify and match student data
-            </p>
+            {latestBatchId && (
+              <Button
+                variant="outline"
+                onClick={handleRollback}
+                className="flex items-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Rollback Changes
+              </Button>
+            )}
           </div>
+          <p className="text-gray-600 text-center mb-8">
+            Upload your Excel file to verify and match student data
+          </p>
 
           {!showMatcher ? (
             <ExcelUploader onDataUpload={handleDataUpload} />
