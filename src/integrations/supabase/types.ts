@@ -40,6 +40,7 @@ export type Database = {
           old_nickname: string | null
           status: string | null
           student_id: string | null
+          user_id: string | null
         }
         Insert: {
           batch_id?: string
@@ -53,6 +54,7 @@ export type Database = {
           old_nickname?: string | null
           status?: string | null
           student_id?: string | null
+          user_id?: string | null
         }
         Update: {
           batch_id?: string
@@ -66,6 +68,7 @@ export type Database = {
           old_nickname?: string | null
           status?: string | null
           student_id?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {

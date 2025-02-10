@@ -49,14 +49,21 @@ const Index = () => {
   };
 
   const fetchLatestBatch = async () => {
+    const { data: session } = await supabase.auth.getSession();
+    if (!session.session) return;
+
     const { data, error } = await supabase
       .from('student_changes')
       .select('batch_id')
+      .eq('status', 'pending')
+      .eq('user_id', session.session.user.id)
       .order('created_at', { ascending: false })
       .limit(1);
 
     if (!error && data && data.length > 0) {
       setLatestBatchId(data[0].batch_id);
+    } else {
+      setLatestBatchId(null);
     }
   };
 
@@ -95,11 +102,15 @@ const Index = () => {
     }
 
     try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) return;
+
       const { data: changes, error: fetchError } = await supabase
         .from('student_changes')
         .select('*')
         .eq('batch_id', latestBatchId)
-        .eq('status', 'pending');
+        .eq('status', 'pending')
+        .eq('user_id', session.session.user.id);
 
       if (fetchError) throw fetchError;
       if (!changes || changes.length === 0) {
@@ -149,10 +160,6 @@ const Index = () => {
 
   const handleNavigateToClass = (className: string) => {
     navigate(`/class/${encodeURIComponent(className)}`);
-    toast({
-      title: "Class Navigation",
-      description: `Navigating to ${className}`,
-    });
   };
 
   const handleLogout = async () => {
@@ -214,3 +221,4 @@ const Index = () => {
 };
 
 export default Index;
+

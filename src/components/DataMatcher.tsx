@@ -81,6 +81,16 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
     }
 
     try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to make changes",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Generate a batch ID for this set of changes
       const batchId = crypto.randomUUID();
 
@@ -94,6 +104,7 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
         new_class: match.excelRow.class,
         new_nickname: match.selected!.nickname, // Keeping the same nickname
         batch_id: batchId,
+        user_id: session.session.user.id,
       }));
 
       // Insert changes into student_changes table
