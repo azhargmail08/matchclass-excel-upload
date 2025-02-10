@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Menu, User } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -70,7 +70,11 @@ export const Navbar = () => {
               <Avatar className="h-8 w-8">
                 <AvatarImage src={userProfile?.avatar_url || undefined} />
                 <AvatarFallback>
-                  <User className="h-4 w-4" />
+                  <img
+                    src="https://admin.studentqr.com/images/logo-my.png"
+                    alt="StudentQR Logo"
+                    className="h-full w-full object-cover"
+                  />
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm text-gray-700">
@@ -108,7 +112,11 @@ export const Navbar = () => {
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={userProfile?.avatar_url || undefined} />
                   <AvatarFallback>
-                    <User className="h-4 w-4" />
+                    <img
+                      src="https://admin.studentqr.com/images/logo-my.png"
+                      alt="StudentQR Logo"
+                      className="h-full w-full object-cover"
+                    />
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-sm text-gray-700">
