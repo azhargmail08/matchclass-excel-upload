@@ -98,8 +98,8 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle>Welcome</CardTitle>
-          <CardDescription>Sign in to your account or create a new one</CardDescription>
+          <CardTitle>StudentQR</CardTitle>
+          <CardDescription>Update Student Section</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login">
