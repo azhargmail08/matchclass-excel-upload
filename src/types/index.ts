@@ -1,8 +1,9 @@
 
 export interface Student {
-  id?: string;
+  id: string;
   name: string;
   class: string;
+  nickname?: string;
 }
 
 export interface ExcelRow {

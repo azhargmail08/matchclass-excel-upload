@@ -27,6 +27,27 @@ export type Database = {
         }
         Relationships: []
       }
+      students: {
+        Row: {
+          class: string
+          id: string
+          name: string
+          nickname: string | null
+        }
+        Insert: {
+          class: string
+          id?: string
+          name: string
+          nickname?: string | null
+        }
+        Update: {
+          class?: string
+          id?: string
+          name?: string
+          nickname?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
