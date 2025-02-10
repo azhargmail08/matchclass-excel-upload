@@ -133,7 +133,7 @@ export default function Auth() {
           {!showSignup ? (
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-gray-600">Email</label>
+                <label className="text-gray-600 font-bold">Email</label>
                 <Input
                   type="email"
                   placeholder="hello@example.com"
@@ -145,7 +145,7 @@ export default function Auth() {
               </div>
               
               <div className="space-y-2">
-                <label className="text-gray-600">Password</label>
+                <label className="text-gray-600 font-bold">Password</label>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
@@ -211,7 +211,7 @@ export default function Auth() {
             ) : (
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-gray-600">Full Name</label>
+                  <label className="text-gray-600 font-bold">Full Name</label>
                   <Input
                     type="text"
                     placeholder="John Doe"
@@ -223,7 +223,7 @@ export default function Auth() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-gray-600">Email</label>
+                  <label className="text-gray-600 font-bold">Email</label>
                   <Input
                     type="email"
                     placeholder="hello@example.com"
@@ -235,7 +235,7 @@ export default function Auth() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-gray-600">Password</label>
+                  <label className="text-gray-600 font-bold">Password</label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
