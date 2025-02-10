@@ -12,6 +12,7 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -33,7 +34,22 @@ export default function Auth() {
         password: loginData.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("Email not confirmed")) {
+          toast({
+            variant: "destructive",
+            title: "Email not confirmed",
+            description: "Please check your email for a confirmation link.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Login failed",
+            description: error.message,
+          });
+        }
+        return;
+      }
       navigate("/");
     } catch (error: any) {
       toast({
@@ -62,9 +78,10 @@ export default function Auth() {
 
       if (error) throw error;
 
+      setSignupSuccess(true);
       toast({
         title: "Registration successful",
-        description: "You can now log in with your credentials.",
+        description: "Please check your email for a confirmation link.",
       });
     } catch (error: any) {
       toast({
@@ -118,38 +135,54 @@ export default function Auth() {
             </TabsContent>
 
             <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div>
-                  <Input
-                    type="text"
-                    placeholder="Full Name"
-                    value={signupData.fullName}
-                    onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
-                    required
-                  />
+              {signupSuccess ? (
+                <div className="text-center space-y-4">
+                  <p className="text-sm text-gray-600">
+                    Registration successful! Please check your email for a confirmation link.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setSignupSuccess(false)}
+                  >
+                    Register another account
+                  </Button>
                 </div>
-                <div>
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={signupData.email}
-                    onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    value={signupData.password}
-                    onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Loading..." : "Sign Up"}
-                </Button>
-              </form>
+              ) : (
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Full Name"
+                      value={signupData.fullName}
+                      onChange={(e) => setSignupData({ ...signupData, fullName: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={signupData.email}
+                      onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      type="password"
+                      placeholder="Password"
+                      value={signupData.password}
+                      onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Loading..." : "Sign Up"}
+                  </Button>
+                </form>
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
