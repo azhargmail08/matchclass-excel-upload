@@ -1,9 +1,13 @@
 
 import { ArrowDown, ArrowRight, GraduationCap, BookOpen } from "lucide-react";
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
-export const Sidebar = () => {
+interface SidebarProps {
+  onClassClick: () => void;
+}
+
+export const Sidebar = ({ onClassClick }: SidebarProps) => {
   const [isManageOpen, setIsManageOpen] = useState(true);
   const location = useLocation();
 
@@ -29,9 +33,9 @@ export const Sidebar = () => {
           </button>
           {isManageOpen && (
             <div className="ml-6 mt-2">
-              <Link
-                to="/class/1A"
-                className={`flex items-center px-4 py-2 text-sm rounded-md ${
+              <button
+                onClick={onClassClick}
+                className={`flex items-center px-4 py-2 text-sm rounded-md w-full ${
                   isActive("/class/1A")
                     ? "bg-blue-50 text-blue-700"
                     : "text-gray-700 hover:bg-gray-50"
@@ -39,7 +43,7 @@ export const Sidebar = () => {
               >
                 <BookOpen className="h-5 w-5 mr-2" />
                 <span>Class</span>
-              </Link>
+              </button>
             </div>
           )}
         </div>
