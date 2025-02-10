@@ -14,6 +14,15 @@ export const ExcelUploader = ({ onDataUpload }: ExcelUploaderProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const { toast } = useToast();
 
+  const validateExcelData = (data: any[]): data is ExcelRow[] => {
+    return data.every(row => 
+      typeof row.name === 'string' && 
+      row.name.trim() !== '' &&
+      typeof row.class === 'string' &&
+      row.class.trim() !== ''
+    );
+  };
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
@@ -22,32 +31,51 @@ export const ExcelUploader = ({ onDataUpload }: ExcelUploaderProps) => {
       reader.onload = (event) => {
         try {
           const binary = event.target?.result;
-          const workbook = XLSX.read(binary, { type: "binary" });
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          const data = XLSX.utils.sheet_to_json<ExcelRow>(worksheet);
-          
-          if (data.length === 0) {
-            toast({
-              title: "Error",
-              description: "The Excel file appears to be empty",
-              variant: "destructive",
-            });
-            return;
+          if (!binary) {
+            throw new Error("Failed to read file");
           }
 
-          onDataUpload(data);
+          const workbook = XLSX.read(binary, { type: "binary" });
+          
+          if (!workbook.SheetNames.length) {
+            throw new Error("Excel file contains no sheets");
+          }
+
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const rawData = XLSX.utils.sheet_to_json(worksheet);
+          
+          if (!Array.isArray(rawData) || rawData.length === 0) {
+            throw new Error("No data found in Excel file");
+          }
+
+          console.log("Raw Excel data:", rawData);
+
+          if (!validateExcelData(rawData)) {
+            throw new Error("Invalid Excel format. File must contain 'name' and 'class' columns with non-empty values");
+          }
+
+          onDataUpload(rawData as ExcelRow[]);
           toast({
             title: "Success",
-            description: `Uploaded ${data.length} records successfully`,
+            description: `Uploaded ${rawData.length} records successfully`,
           });
         } catch (error) {
+          console.error("Excel parsing error:", error);
           toast({
             title: "Error",
-            description: "Failed to parse Excel file",
+            description: error instanceof Error ? error.message : "Failed to parse Excel file",
             variant: "destructive",
           });
         }
+      };
+
+      reader.onerror = () => {
+        toast({
+          title: "Error",
+          description: "Failed to read the file",
+          variant: "destructive",
+        });
       };
 
       reader.readAsBinaryString(file);
@@ -93,6 +121,9 @@ export const ExcelUploader = ({ onDataUpload }: ExcelUploaderProps) => {
           </p>
           <p className="text-xs text-gray-400">
             Supports: .xlsx, .xls
+          </p>
+          <p className="text-xs text-gray-400">
+            File must contain 'name' and 'class' columns
           </p>
         </div>
       </div>
