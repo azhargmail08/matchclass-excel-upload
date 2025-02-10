@@ -1,11 +1,11 @@
 
 import { useState } from "react";
-import { Check, X, RotateCcw } from "lucide-react";
-import { Student, ExcelRow, MatchResult, StudentChange } from "@/types";
+import { MatchResult, Student } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { MatchRow } from "./MatchRow";
+import { sortMatchesByFirstName, createInitialSelectedMatches } from "@/utils/matchingUtils";
+import { updateStudentData } from "@/utils/databaseUtils";
 
 interface DataMatcherProps {
   matches: MatchResult[];
@@ -13,28 +13,9 @@ interface DataMatcherProps {
 }
 
 export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
-  // Sort matches to prioritize first name matches
-  const sortedMatches = matches.map(match => ({
-    ...match,
-    matches: [...match.matches].sort((a, b) => {
-      const aFirstName = a.name.split(' ')[0].toLowerCase();
-      const bFirstName = b.name.split(' ')[0].toLowerCase();
-      const excelFirstName = match.excelRow.name.split(' ')[0].toLowerCase();
-      
-      // If a's first name matches exactly and b's doesn't, a should come first
-      if (aFirstName === excelFirstName && bFirstName !== excelFirstName) return -1;
-      // If b's first name matches exactly and a's doesn't, b should come first
-      if (bFirstName === excelFirstName && aFirstName !== excelFirstName) return 1;
-      
-      return 0;
-    })
-  }));
-
+  const sortedMatches = sortMatchesByFirstName(matches);
   const [selectedMatches, setSelectedMatches] = useState<MatchResult[]>(
-    sortedMatches.map(match => ({
-      ...match,
-      selected: match.matches.length > 0 ? match.matches[0] : undefined
-    }))
+    createInitialSelectedMatches(sortedMatches)
   );
   const [selectedRows, setSelectedRows] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
@@ -81,58 +62,15 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
     }
 
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      const success = await updateStudentData(selectedMatchesToUpdate);
+      
+      if (success) {
         toast({
-          title: "Error",
-          description: "You must be logged in to make changes",
-          variant: "destructive",
+          title: "Success",
+          description: "Data has been updated successfully",
         });
-        return;
+        onConfirm(selectedMatchesToUpdate);
       }
-
-      // Generate a batch ID for this set of changes
-      const batchId = crypto.randomUUID();
-
-      // Create backup entries
-      const changes = selectedMatchesToUpdate.map(match => ({
-        student_id: match.selected!.id,
-        old_name: match.selected!.name,
-        old_class: match.selected!.class,
-        old_nickname: match.selected!.nickname,
-        new_name: match.excelRow.name,
-        new_class: match.excelRow.class,
-        new_nickname: match.selected!.nickname, // Keeping the same nickname
-        batch_id: batchId,
-        user_id: session.session.user.id,
-      }));
-
-      // Insert changes into student_changes table
-      const { error: backupError } = await supabase
-        .from('student_changes')
-        .insert(changes);
-
-      if (backupError) throw backupError;
-
-      // Update students table
-      for (const match of selectedMatchesToUpdate) {
-        const { error: updateError } = await supabase
-          .from('students')
-          .update({
-            name: match.excelRow.name,
-            class: match.excelRow.class,
-          })
-          .eq('id', match.selected!.id);
-
-        if (updateError) throw updateError;
-      }
-
-      toast({
-        title: "Success",
-        description: "Data has been updated successfully",
-      });
-
-      onConfirm(selectedMatchesToUpdate);
     } catch (error) {
       console.error('Error updating data:', error);
       toast({
@@ -152,49 +90,14 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
           </h2>
           <div className="space-y-4">
             {selectedMatches.map((match, index) => (
-              <div
+              <MatchRow
                 key={index}
-                className="p-4 rounded-lg bg-gray-50 border border-gray-200"
-              >
-                <div className="flex items-start space-x-4">
-                  <Checkbox
-                    id={`row-${index}`}
-                    checked={selectedRows[index] || false}
-                    onCheckedChange={(checked) => handleCheckboxChange(index, checked as boolean)}
-                  />
-                  <div className="flex-grow">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-gray-700">
-                          Excel Entry: {match.excelRow.name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Class: {match.excelRow.class}
-                        </p>
-                      </div>
-                      <div className="flex-1 max-w-md ml-4">
-                        <select
-                          className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sage-500"
-                          value={match.selected?.id || ""}
-                          onChange={(e) => {
-                            const selected = match.matches.find(
-                              (s) => s.id === e.target.value
-                            );
-                            handleSelect(index, selected);
-                          }}
-                        >
-                          {match.matches.map((student) => (
-                            <option key={student.id} value={student.id}>
-                              {student.name} ({student.class})
-                            </option>
-                          ))}
-                          <option value="">Select a match...</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                match={match}
+                index={index}
+                isChecked={selectedRows[index] || false}
+                onCheckboxChange={handleCheckboxChange}
+                onSelect={handleSelect}
+              />
             ))}
           </div>
         </div>
