@@ -97,17 +97,17 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md p-6 space-y-8 bg-white shadow-sm border-0">
         <div className="flex justify-center">
           <img 
             src="https://admin.studentqr.com/images/logo-my.png" 
             alt="StudentQR Logo" 
-            className="h-12 object-contain mb-8"
+            className="h-12 object-contain"
           />
         </div>
 
-        <Card className="p-6 bg-white shadow-sm border-0">
+        <div>
           <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
             {showSignup ? "Create Your Account" : "Sign In Your Account"}
           </h2>
@@ -161,7 +161,7 @@ export default function Auth() {
                 {loading ? "Signing in..." : "Sign Me In"}
               </Button>
 
-              <p className="text-center text-gray-600 mt-4">
+              <p className="text-center text-gray-600">
                 Don't Have An Account?{" "}
                 <button
                   type="button"
@@ -245,7 +245,7 @@ export default function Auth() {
                   {loading ? "Signing up..." : "Sign Up"}
                 </Button>
 
-                <p className="text-center text-gray-600 mt-4">
+                <p className="text-center text-gray-600">
                   Already Have An Account?{" "}
                   <button
                     type="button"
@@ -258,9 +258,9 @@ export default function Auth() {
               </form>
             )
           )}
-        </Card>
+        </div>
 
-        <div className="mt-8 p-6 border rounded-lg bg-white">
+        <div className="mt-8">
           <h3 className="text-center text-lg font-medium text-gray-800 mb-4">Teacher App</h3>
           <div className="flex items-center justify-center space-x-4">
             <img src="https://admin.studentqr.com/images/logo-my.png" alt="QR Logo" className="w-12 h-12" />
@@ -280,7 +280,7 @@ export default function Auth() {
             </a>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
