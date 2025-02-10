@@ -30,3 +30,8 @@ export interface StudentChange {
   status: 'pending' | 'applied' | 'rolled_back';
   batch_id: string;
 }
+
+export interface ColumnMapping {
+  name: string;
+  class: string;
+}
