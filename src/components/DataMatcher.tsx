@@ -150,12 +150,12 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
                             handleSelect(index, selected);
                           }}
                         >
-                          <option value="">Select a match...</option>
                           {match.matches.map((student) => (
                             <option key={student.id} value={student.id}>
                               {student.name} ({student.class})
                             </option>
                           ))}
+                          <option value="">Select a match...</option>
                         </select>
                       </div>
                     </div>
@@ -188,3 +188,4 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
     </div>
   );
 };
+
