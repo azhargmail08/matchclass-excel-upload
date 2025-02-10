@@ -13,8 +13,25 @@ interface DataMatcherProps {
 }
 
 export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
+  // Sort matches to prioritize first name matches
+  const sortedMatches = matches.map(match => ({
+    ...match,
+    matches: [...match.matches].sort((a, b) => {
+      const aFirstName = a.name.split(' ')[0].toLowerCase();
+      const bFirstName = b.name.split(' ')[0].toLowerCase();
+      const excelFirstName = match.excelRow.name.split(' ')[0].toLowerCase();
+      
+      // If a's first name matches exactly and b's doesn't, a should come first
+      if (aFirstName === excelFirstName && bFirstName !== excelFirstName) return -1;
+      // If b's first name matches exactly and a's doesn't, b should come first
+      if (bFirstName === excelFirstName && aFirstName !== excelFirstName) return 1;
+      
+      return 0;
+    })
+  }));
+
   const [selectedMatches, setSelectedMatches] = useState<MatchResult[]>(
-    matches.map(match => ({
+    sortedMatches.map(match => ({
       ...match,
       selected: match.matches.length > 0 ? match.matches[0] : undefined
     }))
@@ -193,4 +210,3 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
     </div>
   );
 };
-
