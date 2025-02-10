@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,25 @@ export default function Auth() {
   const [showSignup, setShowSignup] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+
+  useEffect(() => {
+    const loadFont = async () => {
+      const font = new FontFace(
+        'Poppins',
+        'url(https://fonts.googleapis.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2)'
+      );
+
+      try {
+        await font.load();
+        document.fonts.add(font);
+        console.log('Poppins font loaded successfully');
+      } catch (error) {
+        console.error('Error loading Poppins font:', error);
+      }
+    };
+
+    loadFont();
+  }, []);
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -97,7 +115,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
       <Card className="w-full max-w-md p-6 space-y-8 bg-white shadow-sm border-0">
         <div className="flex justify-center">
           <img 
