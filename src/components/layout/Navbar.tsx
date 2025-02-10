@@ -2,9 +2,15 @@
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut, Menu } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -65,41 +71,53 @@ export const Navbar = () => {
               </a>
             </div>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
-            <div className="flex items-center bg-gray-50 rounded-[20px] px-4 py-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={userProfile?.avatar_url || undefined} />
-                <AvatarFallback>
-                  <img
-                    src="https://admin.studentqr.com/images/logo-my.png"
-                    alt="StudentQR Logo"
-                    className="h-full w-full object-cover"
-                  />
-                </AvatarFallback>
-              </Avatar>
-              <span className="ml-3 text-sm text-gray-700">
-                {userProfile?.full_name || 'User'}
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <LogOut className="h-5 w-5" />
-            </Button>
+          <div className="hidden sm:ml-6 sm:flex sm:items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex items-center bg-gray-50 rounded-[20px] px-4 py-2 cursor-pointer hover:bg-gray-100 transition-colors">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={userProfile?.avatar_url || undefined} />
+                    <AvatarFallback>
+                      <img
+                        src="https://admin.studentqr.com/images/logo-my.png"
+                        alt="StudentQR Logo"
+                        className="h-full w-full object-cover"
+                      />
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="ml-3 text-sm text-gray-700">
+                    {userProfile?.full_name || 'User'}
+                  </span>
+                  <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <div className="flex items-center sm:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-500 hover:text-gray-700"
+          <button
+            className="sm:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <span className="sr-only">Open menu</span>
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <Menu className="h-6 w-6" />
-            </Button>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
         </div>
       </div>
 
