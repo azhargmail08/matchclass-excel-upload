@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ExcelUploader } from "@/components/ExcelUploader";
 import { DataMatcher } from "@/components/DataMatcher";
@@ -147,6 +148,7 @@ const Index = () => {
   };
 
   const handleNavigateToClass = (className: string) => {
+    navigate(`/class/${encodeURIComponent(className)}`);
     toast({
       title: "Class Navigation",
       description: `Navigating to ${className}`,
