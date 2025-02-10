@@ -19,7 +19,7 @@ export default function Auth() {
           <img 
             src="https://admin.studentqr.com/images/logo-my.png" 
             alt="StudentQR Logo" 
-            className="h-12 object-contain"
+            className="h-[200px] w-[200px] object-contain"
           />
         </div>
 
