@@ -66,7 +66,7 @@ export const Navbar = () => {
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center bg-gray-50 rounded-[20px] px-4 py-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={userProfile?.avatar_url || undefined} />
                 <AvatarFallback>
@@ -77,7 +77,7 @@ export const Navbar = () => {
                   />
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm text-gray-700">
+              <span className="ml-3 text-sm text-gray-700">
                 {userProfile?.full_name || 'User'}
               </span>
             </div>
@@ -108,7 +108,7 @@ export const Navbar = () => {
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
             <div className="px-4 py-2 border-b border-gray-200">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center bg-gray-50 rounded-[20px] px-4 py-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={userProfile?.avatar_url || undefined} />
                   <AvatarFallback>
@@ -119,7 +119,7 @@ export const Navbar = () => {
                     />
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm text-gray-700">
+                <span className="ml-3 text-sm text-gray-700">
                   {userProfile?.full_name || 'User'}
                 </span>
               </div>
@@ -148,4 +148,3 @@ export const Navbar = () => {
     </nav>
   );
 };
-
