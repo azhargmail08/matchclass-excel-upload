@@ -58,18 +58,13 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Excel Data Verification
-              </h1>
-              <p className="text-gray-600">
-                Upload your Excel file to verify and match student data
-              </p>
-            </div>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
+              Excel Data Verification
+            </h1>
+            <p className="text-gray-600 text-center">
+              Upload your Excel file to verify and match student data
+            </p>
           </div>
 
           {!showMatcher ? (
@@ -77,6 +72,12 @@ const Index = () => {
           ) : (
             <DataMatcher matches={matches} onConfirm={handleConfirm} />
           )}
+
+          <div className="mt-8 flex justify-center">
+            <Button variant="outline" onClick={handleLogout}>
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
     </div>
