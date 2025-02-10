@@ -13,7 +13,12 @@ interface DataMatcherProps {
 }
 
 export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
-  const [selectedMatches, setSelectedMatches] = useState<MatchResult[]>(matches);
+  const [selectedMatches, setSelectedMatches] = useState<MatchResult[]>(
+    matches.map(match => ({
+      ...match,
+      selected: match.matches.length > 0 ? match.matches[0] : undefined
+    }))
+  );
   const [selectedRows, setSelectedRows] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
 
