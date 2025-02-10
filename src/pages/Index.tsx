@@ -153,7 +153,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="container mx-auto px-4 py-8 flex-grow">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto text-center">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">
               Excel Data Verification
@@ -169,7 +169,7 @@ const Index = () => {
               </Button>
             )}
           </div>
-          <p className="text-gray-600 text-center mb-8">
+          <p className="text-gray-600 mb-8">
             Upload your Excel file to verify and match student data
           </p>
 
