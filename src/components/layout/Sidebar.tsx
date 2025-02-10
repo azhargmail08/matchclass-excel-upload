@@ -15,7 +15,7 @@ export const Sidebar = () => {
         <div>
           <button
             onClick={() => setIsManageOpen(!isManageOpen)}
-            className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-white bg-[#0EA5E9] hover:bg-[#0284C7] rounded-[30px]"
+            className="flex items-center justify-between w-full px-4 py-2 text-sm font-medium text-white bg-[#1E33F2] hover:bg-[#1E33F2]/90 rounded-[30px]"
           >
             <div className="flex items-center">
               <GraduationCap className="h-5 w-5 mr-2" />
