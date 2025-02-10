@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ExcelUploader } from "@/components/ExcelUploader";
 import { DataMatcher } from "@/components/DataMatcher";
@@ -7,13 +6,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ArrowRight } from "lucide-react";
 
 const Index = () => {
   const [matches, setMatches] = useState<MatchResult[]>([]);
   const [showMatcher, setShowMatcher] = useState(false);
   const [students, setStudents] = useState<Student[]>([]);
   const [latestBatchId, setLatestBatchId] = useState<string | null>(null);
+  const [uniqueClasses, setUniqueClasses] = useState<string[]>([]);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -21,6 +21,11 @@ const Index = () => {
     fetchStudents();
     fetchLatestBatch();
   }, []);
+
+  useEffect(() => {
+    const classes = [...new Set(students.map(student => student.class))].sort();
+    setUniqueClasses(classes);
+  }, [students]);
 
   const fetchStudents = async () => {
     const { data, error } = await supabase
@@ -89,7 +94,6 @@ const Index = () => {
     }
 
     try {
-      // Get the changes for the latest batch
       const { data: changes, error: fetchError } = await supabase
         .from('student_changes')
         .select('*')
@@ -105,9 +109,7 @@ const Index = () => {
         return;
       }
 
-      // Rollback each change
       for (const change of changes) {
-        // Update student record back to original values
         const { error: updateError } = await supabase
           .from('students')
           .update({
@@ -119,7 +121,6 @@ const Index = () => {
 
         if (updateError) throw updateError;
 
-        // Update change status
         const { error: statusError } = await supabase
           .from('student_changes')
           .update({ status: 'rolled_back' })
@@ -143,6 +144,13 @@ const Index = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleNavigateToClass = (className: string) => {
+    toast({
+      title: "Class Navigation",
+      description: `Navigating to ${className}`,
+    });
   };
 
   const handleLogout = async () => {
@@ -181,7 +189,20 @@ const Index = () => {
         </div>
       </div>
       
-      <div className="py-8 flex justify-center">
+      <div className="py-4 flex flex-col items-center gap-2">
+        <div className="flex flex-wrap justify-center gap-2 mb-4">
+          {uniqueClasses.map((className) => (
+            <Button
+              key={className}
+              variant="outline"
+              onClick={() => handleNavigateToClass(className)}
+              className="flex items-center gap-2"
+            >
+              {className}
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          ))}
+        </div>
         <Button variant="outline" onClick={handleLogout}>
           Logout
         </Button>
