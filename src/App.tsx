@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import Class from "./pages/Class";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -52,7 +52,15 @@ const App = () => (
             path="/"
             element={
               <ProtectedRoute>
-                <Index />
+                <Navigate to="/dashboard" replace />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
               </ProtectedRoute>
             }
           />

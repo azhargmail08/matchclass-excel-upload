@@ -46,7 +46,7 @@ export const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
         }
         return;
       }
-      navigate("/");
+      navigate("/dashboard");
     } catch (error: any) {
       toast({
         variant: "destructive",
