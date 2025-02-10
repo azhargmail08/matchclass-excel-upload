@@ -148,3 +148,4 @@ export const Navbar = () => {
     </nav>
   );
 };
+
