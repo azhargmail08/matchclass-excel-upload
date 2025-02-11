@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface StudentTableProps {
   students: Student[];
@@ -12,6 +14,64 @@ interface StudentTableProps {
 
 export const StudentTable = ({ students }: StudentTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingStudents, setEditingStudents] = useState<{ [key: string]: Student }>({});
+  const { toast } = useToast();
+
+  const handleInputChange = (studentId: string, field: keyof Student, value: string) => {
+    setEditingStudents(prev => ({
+      ...prev,
+      [studentId]: {
+        ...(prev[studentId] || students.find(s => s._id === studentId)!),
+        [field]: value
+      }
+    }));
+  };
+
+  const handleUpdate = async (studentId: string) => {
+    try {
+      const updatedStudent = editingStudents[studentId];
+      const { error } = await supabase
+        .from('students')
+        .update(updatedStudent)
+        .eq('_id', studentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Student information updated successfully",
+      });
+
+      // Clear the editing state for this student
+      setEditingStudents(prev => {
+        const newState = { ...prev };
+        delete newState[studentId];
+        return newState;
+      });
+    } catch (error) {
+      console.error('Error updating student:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update student information",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getEditableValue = (student: Student, field: keyof Student) => {
+    return editingStudents[student._id]?.[field] ?? student[field];
+  };
+
+  const renderEditableField = (student: Student, field: keyof Student, label: string) => (
+    <div>
+      <span className="text-sm text-gray-500">{label}:</span>
+      <Input
+        value={getEditableValue(student, field)?.toString() || ''}
+        onChange={(e) => handleInputChange(student._id, field, e.target.value)}
+        className="mt-1"
+      />
+    </div>
+  );
 
   return (
     <div>
@@ -47,65 +107,37 @@ export const StudentTable = ({ students }: StudentTableProps) => {
               <Card key={student._id} className="w-full">
                 <CardContent className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <h3 className="font-semibold text-lg mb-4">{student.name}</h3>
-                      <div className="space-y-2">
-                        <div>
-                          <span className="text-sm text-gray-500">Name on Badges:</span>
-                          <p>{student.special_name || student.nickname || '-'}</p>
-                        </div>
-                        <div>
-                          <span className="text-sm text-gray-500">Matrix No.:</span>
-                          <p>{student.matrix_number || '-'}</p>
-                        </div>
-                        <div>
-                          <span className="text-sm text-gray-500">Date Joined:</span>
-                          <p>{student.date_joined ? format(new Date(student.date_joined), 'dd/MM/yyyy') : '-'}</p>
-                        </div>
-                        <div>
-                          <span className="text-sm text-gray-500">Contact No.:</span>
-                          <p>{student.contact_no || '-'}</p>
-                        </div>
-                      </div>
+                    <div className="space-y-4">
+                      {renderEditableField(student, 'name', 'Name')}
+                      {renderEditableField(student, 'special_name', 'Name on Badges')}
+                      {renderEditableField(student, 'matrix_number', 'Matrix No.')}
+                      {renderEditableField(student, 'contact_no', 'Contact No.')}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <h4 className="font-medium mb-2">Father's Information</h4>
-                      <div>
-                        <span className="text-sm text-gray-500">Name:</span>
-                        <p>{student.father_name || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-500">ID:</span>
-                        <p>{student.father_id || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-500">Email:</span>
-                        <p className="break-all">{student.father_email || '-'}</p>
-                      </div>
+                      {renderEditableField(student, 'father_name', 'Name')}
+                      {renderEditableField(student, 'father_id', 'ID')}
+                      {renderEditableField(student, 'father_email', 'Email')}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       <h4 className="font-medium mb-2">Mother's Information</h4>
-                      <div>
-                        <span className="text-sm text-gray-500">Name:</span>
-                        <p>{student.mother_name || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-500">ID:</span>
-                        <p>{student.mother_id || '-'}</p>
-                      </div>
-                      <div>
-                        <span className="text-sm text-gray-500">Email:</span>
-                        <p className="break-all">{student.mother_email || '-'}</p>
-                      </div>
+                      {renderEditableField(student, 'mother_name', 'Name')}
+                      {renderEditableField(student, 'mother_id', 'ID')}
+                      {renderEditableField(student, 'mother_email', 'Email')}
                     </div>
                   </div>
 
                   <div className="flex justify-end mt-4">
-                    <Button variant="ghost" size="sm">
-                      Update
-                    </Button>
+                    {editingStudents[student._id] ? (
+                      <Button 
+                        onClick={() => handleUpdate(student._id)}
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        Save Changes
+                      </Button>
+                    ) : null}
                   </div>
                 </CardContent>
               </Card>
