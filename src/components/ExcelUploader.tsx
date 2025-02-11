@@ -44,7 +44,7 @@ export const ExcelUploader = ({ onDataUpload }: ExcelUploaderProps) => {
 
   return (
     <>
-      <DropZone onExcelParsed={handleExcelParsed} />
+      {processedData.length === 0 && <DropZone onExcelParsed={handleExcelParsed} />}
 
       <ColumnMappingDialog
         open={showMapping}

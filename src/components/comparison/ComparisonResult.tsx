@@ -24,16 +24,18 @@ export const ComparisonResult = ({
       <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 space-y-4 sm:space-y-0">
         <div className="flex-1">
           <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={(checked) => onRowSelect(checked as boolean)}
-              />
-              <h3 className="font-medium text-gray-700">Excel Entry:</h3>
-            </div>
+            <h3 className="font-medium text-gray-700">Excel Entry:</h3>
             <div className="bg-gray-50 p-3 rounded">
-              <p className="break-words">{excelEntry.name}</p>
-              <p className="text-sm text-gray-500 break-words">{excelEntry.class}</p>
+              <div className="flex items-start space-x-2">
+                <Checkbox
+                  checked={isSelected}
+                  onCheckedChange={(checked) => onRowSelect(checked as boolean)}
+                />
+                <div className="flex-1">
+                  <p className="break-words">{excelEntry.name}</p>
+                  <p className="text-sm text-gray-500 break-words">{excelEntry.class}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
