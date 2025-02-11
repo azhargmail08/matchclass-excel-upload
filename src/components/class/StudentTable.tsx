@@ -72,9 +72,9 @@ export const StudentTable = ({ students }: StudentTableProps) => {
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow border">
-        <ScrollArea className="h-[600px] rounded-md">
-          <div className="min-w-[1200px]">
+      <div className="bg-white rounded-lg shadow border overflow-hidden">
+        <ScrollArea className="h-[600px] w-full">
+          <div className="min-w-[1500px]">
             <table className="w-full border-collapse">
               <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
