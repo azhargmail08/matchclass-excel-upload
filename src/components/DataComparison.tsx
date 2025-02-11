@@ -27,7 +27,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
     const fetchAndCompare = async () => {
       try {
         const { data: externalStudents, error } = await supabase
-          .from('students')
+          .from('external_students')
           .select('*')
           .order('name');
 
