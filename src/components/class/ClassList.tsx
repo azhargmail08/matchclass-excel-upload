@@ -15,7 +15,16 @@ import {
   ListFilter,
   Trash2,
   Upload,
+  X,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ExcelUploader } from "@/components/ExcelUploader";
 
 interface ClassListProps {
   classes: ClassDetails[];
@@ -46,14 +55,30 @@ export const ClassList = ({ classes, searchQuery, setSearchQuery }: ClassListPro
                 <Download className="w-4 h-4" />
                 Download Class QR
               </Button>
-              <Button 
-                variant="outline" 
-                className="gap-2 hover:bg-gray-50 transition-all duration-200"
-                onClick={() => navigate('/')}
-              >
-                <Upload className="w-4 h-4" />
-                Update Students
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="gap-2 hover:bg-gray-50 transition-all duration-200"
+                  >
+                    <Upload className="w-4 h-4" />
+                    Update Students
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center justify-between">
+                      Upload Student Excel File
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="py-6">
+                    <ExcelUploader onDataUpload={(data) => {
+                      console.log('Uploaded data:', data);
+                      // Handle the uploaded data here
+                    }} />
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           <Button 
