@@ -50,57 +50,61 @@ export const ColumnMapping = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="h-[80vh] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="h-[80vh] max-h-[80vh] overflow-y-auto w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[60%]">
         <DialogHeader>
-          <DialogTitle>Map Excel Columns</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl text-center">Map Excel Columns</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Name Column:</label>
-            <Select
-              value={columnMapping.name}
-              onValueChange={(value) =>
-                onColumnMappingChange({ ...columnMapping, name: value })
-              }
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select name column" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableColumns.map((column) => (
-                  <SelectItem key={column} value={column}>
-                    {column}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <label className="text-sm sm:text-right">Name Column:</label>
+            <div className="col-span-1 sm:col-span-3">
+              <Select
+                value={columnMapping.name}
+                onValueChange={(value) =>
+                  onColumnMappingChange({ ...columnMapping, name: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select name column" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableColumns.map((column) => (
+                    <SelectItem key={column} value={column}>
+                      {column}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label className="text-right text-sm">Class Column:</label>
-            <Select
-              value={columnMapping.class}
-              onValueChange={(value) =>
-                onColumnMappingChange({ ...columnMapping, class: value })
-              }
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select class column" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableColumns.map((column) => (
-                  <SelectItem key={column} value={column}>
-                    {column}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
+            <label className="text-sm sm:text-right">Class Column:</label>
+            <div className="col-span-1 sm:col-span-3">
+              <Select
+                value={columnMapping.class}
+                onValueChange={(value) =>
+                  onColumnMappingChange({ ...columnMapping, class: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select class column" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableColumns.map((column) => (
+                    <SelectItem key={column} value={column}>
+                      {column}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
             Cancel
           </Button>
-          <Button onClick={handleConfirm}>
+          <Button onClick={handleConfirm} className="w-full sm:w-auto">
             Confirm Mapping
           </Button>
         </DialogFooter>
@@ -108,4 +112,3 @@ export const ColumnMapping = ({
     </Dialog>
   );
 };
-
