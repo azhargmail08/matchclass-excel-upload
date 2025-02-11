@@ -20,21 +20,23 @@ import { Card, CardContent } from "@/components/ui/card";
 const Class = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const className = "1A";
+  const [classes, setClasses] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchClassStudents = async () => {
+    const fetchClassesAndStudents = async () => {
       const { data, error } = await supabase
         .from('students')
-        .select('*')
-        .eq('class', className);
+        .select('*');
       
       if (!error && data) {
         setStudents(data);
+        // Get unique classes
+        const uniqueClasses = Array.from(new Set(data.map(student => student.class)));
+        setClasses(uniqueClasses);
       }
     };
 
-    fetchClassStudents();
+    fetchClassesAndStudents();
   }, []);
 
   return (
@@ -128,51 +130,52 @@ const Class = () => {
           </CardContent>
         </Card>
 
-        <p className="text-sm text-gray-600 mb-8">Total Of 2 Class(es): Level 1</p>
+        <p className="text-sm text-gray-600 mb-8">Total Of {classes.length} Class(es)</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {Array.from({ length: 2 }).map((_, index) => (
-            <div 
-              key={index} 
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-100"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xl font-semibold text-gray-800">Level 1</span>
-                <span className="text-xl font-semibold text-gray-800">-</span>
-                <h3 className="text-xl font-semibold text-gray-800">
-                  {index === 0 ? "ALIA" : "AMANAH"}
-                </h3>
+          {classes.map((className, index) => {
+            const studentsInClass = students.filter(student => student.class === className);
+            return (
+              <div 
+                key={index} 
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-100"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    {className}
+                  </h3>
+                </div>
+                <div className="space-y-3 mb-6">
+                  <p className="text-sm flex items-center">
+                    <span className="text-gray-500 min-w-20">Level:</span>
+                    <span className="text-gray-700">{className.split(' ')[0]}</span>
+                  </p>
+                  <p className="text-sm flex items-center">
+                    <span className="text-gray-500 min-w-20">Year:</span>
+                    <span className="text-gray-700">2024</span>
+                  </p>
+                  <p className="text-sm flex items-center">
+                    <span className="text-gray-500 min-w-20">No Of Students:</span>
+                    <span className="text-gray-700">{studentsInClass.length}</span>
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button className="p-2 hover:bg-blue-50 rounded-lg transition-colors group">
+                    <Eye className="w-4 h-4 text-blue-500 group-hover:text-blue-600" />
+                  </button>
+                  <button className="p-2 hover:bg-green-50 rounded-lg transition-colors group">
+                    <FileEdit className="w-4 h-4 text-green-500 group-hover:text-green-600" />
+                  </button>
+                  <button className="p-2 hover:bg-yellow-50 rounded-lg transition-colors group">
+                    <ListFilter className="w-4 h-4 text-yellow-500 group-hover:text-yellow-600" />
+                  </button>
+                  <button className="p-2 hover:bg-red-50 rounded-lg transition-colors group">
+                    <Trash2 className="w-4 h-4 text-red-500 group-hover:text-red-600" />
+                  </button>
+                </div>
               </div>
-              <div className="space-y-3 mb-6">
-                <p className="text-sm flex items-center">
-                  <span className="text-gray-500 min-w-20">Level:</span>
-                  <span className="text-gray-700">1</span>
-                </p>
-                <p className="text-sm flex items-center">
-                  <span className="text-gray-500 min-w-20">Year:</span>
-                  <span className="text-gray-700">2024</span>
-                </p>
-                <p className="text-sm flex items-center">
-                  <span className="text-gray-500 min-w-20">No Of Students:</span>
-                  <span className="text-gray-700">{index === 0 ? "8" : "22"}</span>
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button className="p-2 hover:bg-blue-50 rounded-lg transition-colors group">
-                  <Eye className="w-4 h-4 text-blue-500 group-hover:text-blue-600" />
-                </button>
-                <button className="p-2 hover:bg-green-50 rounded-lg transition-colors group">
-                  <FileEdit className="w-4 h-4 text-green-500 group-hover:text-green-600" />
-                </button>
-                <button className="p-2 hover:bg-yellow-50 rounded-lg transition-colors group">
-                  <ListFilter className="w-4 h-4 text-yellow-500 group-hover:text-yellow-600" />
-                </button>
-                <button className="p-2 hover:bg-red-50 rounded-lg transition-colors group">
-                  <Trash2 className="w-4 h-4 text-red-500 group-hover:text-red-600" />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
