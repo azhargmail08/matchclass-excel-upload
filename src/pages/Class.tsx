@@ -61,11 +61,24 @@ const Class = () => {
     }
   };
 
+  // Initial fetch
   useEffect(() => {
     if (className) {
       fetchClassDetails();
     }
-  }, [className, toast]);
+  }, [className]);
+
+  // Refresh data when window regains focus
+  useEffect(() => {
+    const onFocus = () => {
+      if (className) {
+        fetchClassDetails();
+      }
+    };
+
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [className]);
 
   if (notFound) {
     return (
