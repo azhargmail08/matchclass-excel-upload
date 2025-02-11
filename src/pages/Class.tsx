@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Student } from "@/types";
 import { ClassList } from "@/components/class/ClassList";
 import { ClassDetailsView } from "@/components/class/ClassDetails";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export interface ClassDetails {
   className: string;
@@ -56,7 +55,7 @@ const Class = () => {
     fetchClassesAndStudents();
   }, [className]);
 
-  const content = className && selectedClass ? (
+  return className && selectedClass ? (
     <ClassDetailsView classDetails={selectedClass} />
   ) : (
     <ClassList 
@@ -64,12 +63,6 @@ const Class = () => {
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
     />
-  );
-
-  return (
-    <DashboardLayout onClassClick={() => {}}>
-      {content}
-    </DashboardLayout>
   );
 };
 
