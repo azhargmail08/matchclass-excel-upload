@@ -119,7 +119,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       const syncRecords = selectedResults.map(result => ({
         batch_id: batchData.id,
         student_id: result.selectedMatch!._id,
-        external_student_id: result.excelEntry.name,
+        external_student_id: result.selectedMatch!._id, // Updated: Using _id instead of name
         status: 'pending'
       }));
 
@@ -196,3 +196,4 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
     </div>
   );
 };
+
