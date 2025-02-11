@@ -30,6 +30,76 @@ export type Database = {
         }
         Relationships: []
       }
+      data_sync_batches: {
+        Row: {
+          created_at: string
+          id: string
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      data_sync_records: {
+        Row: {
+          batch_id: string | null
+          created_at: string
+          external_student_id: string | null
+          id: string
+          status: string | null
+          student_id: string | null
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string
+          external_student_id?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string | null
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string
+          external_student_id?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_sync_records_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "data_sync_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_sync_records_external_student_id_fkey"
+            columns: ["external_student_id"]
+            isOneToOne: false
+            referencedRelation: "external_students"
+            referencedColumns: ["_id"]
+          },
+          {
+            foreignKeyName: "data_sync_records_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["_id"]
+          },
+        ]
+      }
       external_students: {
         Row: {
           _id: string
