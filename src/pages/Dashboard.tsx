@@ -39,17 +39,8 @@ export default function Dashboard() {
         });
       });
 
-      // Then, add any classes that only exist in the students table
+      // Add students to their respective classes
       studentsData?.forEach(student => {
-        if (!classMap.has(student.class)) {
-          classMap.set(student.class, {
-            className: student.class,
-            teacher: student.teacher || 'Unassigned',
-            students: []
-          });
-        }
-        
-        // Add student to their class
         const classDetails = classMap.get(student.class);
         if (classDetails) {
           classDetails.students.push({
