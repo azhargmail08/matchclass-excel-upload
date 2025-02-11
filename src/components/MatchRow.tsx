@@ -38,16 +38,16 @@ export const MatchRow = ({
             <div className="flex-1 max-w-md ml-4">
               <select
                 className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sage-500"
-                value={match.selected?.id || ""}
+                value={match.selected?._id || ""}
                 onChange={(e) => {
                   const selected = match.matches.find(
-                    (s) => s.id === e.target.value
+                    (s) => s._id === e.target.value
                   );
                   onSelect(index, selected);
                 }}
               >
                 {match.matches.map((student) => (
-                  <option key={student.id} value={student.id}>
+                  <option key={student._id} value={student._id}>
                     {student.name} ({student.class})
                   </option>
                 ))}

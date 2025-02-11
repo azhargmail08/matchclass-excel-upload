@@ -39,7 +39,7 @@ export default function Dashboard() {
               };
             }
             acc[student.class].students.push({
-              id: student.id,
+              _id: student._id,
               name: student.name,
               class: student.class,
               nickname: student.nickname
