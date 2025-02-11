@@ -1,3 +1,4 @@
+
 import { Student } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,7 +58,7 @@ export const StudentTable = ({ students }: StudentTableProps) => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full">
       <div className="flex justify-between items-center">
         <Input
           placeholder="Search Student"
@@ -72,8 +73,8 @@ export const StudentTable = ({ students }: StudentTableProps) => {
       </div>
 
       <div className="relative rounded-lg shadow border">
-        <ScrollArea className="h-[600px]" style={{ overflow: 'hidden' }}>
-          <div style={{ width: '100%', overflowX: 'auto' }}>
+        <ScrollArea className="h-[600px]">
+          <div className="overflow-x-auto">
             <table className="w-full border-collapse min-w-[1200px]">
               <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
