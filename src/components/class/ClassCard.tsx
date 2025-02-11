@@ -1,13 +1,49 @@
 
 import { FileEdit, Eye, ListFilter, Trash2 } from "lucide-react";
 import { ClassDetails } from "@/pages/Class";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ClassCardProps {
   classDetails: ClassDetails;
   onClick: () => void;
+  onDelete?: () => void;
 }
 
-export const ClassCard = ({ classDetails, onClick }: ClassCardProps) => {
+export const ClassCard = ({ classDetails, onClick, onDelete }: ClassCardProps) => {
+  const { toast } = useToast();
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card click
+    
+    if (!confirm(`Are you sure you want to delete ${classDetails.className}?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('classes')
+        .delete()
+        .eq('name', classDetails.className);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Class ${classDetails.className} has been deleted`,
+      });
+
+      onDelete?.();
+    } catch (error) {
+      console.error('Error deleting class:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete class. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div 
       className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-100 cursor-pointer"
@@ -46,7 +82,10 @@ export const ClassCard = ({ classDetails, onClick }: ClassCardProps) => {
         <button className="p-2 hover:bg-yellow-50 rounded-lg transition-colors group">
           <ListFilter className="w-4 h-4 text-yellow-500 group-hover:text-yellow-600" />
         </button>
-        <button className="p-2 hover:bg-red-50 rounded-lg transition-colors group">
+        <button 
+          className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
+          onClick={handleDelete}
+        >
           <Trash2 className="w-4 h-4 text-red-500 group-hover:text-red-600" />
         </button>
       </div>

@@ -11,68 +11,68 @@ export default function Dashboard() {
   const [classes, setClasses] = useState<ClassDetails[]>([]);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        // Fetch all classes first
-        const { data: classesData, error: classesError } = await supabase
-          .from('classes')
-          .select('*');
+  const fetchClasses = async () => {
+    try {
+      // Fetch all classes first
+      const { data: classesData, error: classesError } = await supabase
+        .from('classes')
+        .select('*');
 
-        if (classesError) throw classesError;
+      if (classesError) throw classesError;
 
-        // Then fetch all students
-        const { data: studentsData, error: studentsError } = await supabase
-          .from('students')
-          .select('*');
+      // Then fetch all students
+      const { data: studentsData, error: studentsError } = await supabase
+        .from('students')
+        .select('*');
 
-        if (studentsError) throw studentsError;
+      if (studentsError) throw studentsError;
 
-        // Create a map of classes with their students
-        const classMap = new Map<string, ClassDetails>();
+      // Create a map of classes with their students
+      const classMap = new Map<string, ClassDetails>();
 
-        // First, add all classes from the classes table
-        classesData?.forEach(classItem => {
-          classMap.set(classItem.name, {
-            className: classItem.name,
-            teacher: classItem.teacher || 'Unassigned',
+      // First, add all classes from the classes table
+      classesData?.forEach(classItem => {
+        classMap.set(classItem.name, {
+          className: classItem.name,
+          teacher: classItem.teacher || 'Unassigned',
+          students: []
+        });
+      });
+
+      // Then, add any classes that only exist in the students table
+      studentsData?.forEach(student => {
+        if (!classMap.has(student.class)) {
+          classMap.set(student.class, {
+            className: student.class,
+            teacher: student.teacher || 'Unassigned',
             students: []
           });
-        });
+        }
+        
+        // Add student to their class
+        const classDetails = classMap.get(student.class);
+        if (classDetails) {
+          classDetails.students.push({
+            _id: student._id,
+            name: student.name,
+            class: student.class,
+            nickname: student.nickname
+          });
+        }
+      });
 
-        // Then, add any classes that only exist in the students table
-        studentsData?.forEach(student => {
-          if (!classMap.has(student.class)) {
-            classMap.set(student.class, {
-              className: student.class,
-              teacher: student.teacher || 'Unassigned',
-              students: []
-            });
-          }
-          
-          // Add student to their class
-          const classDetails = classMap.get(student.class);
-          if (classDetails) {
-            classDetails.students.push({
-              _id: student._id,
-              name: student.name,
-              class: student.class,
-              nickname: student.nickname
-            });
-          }
-        });
+      setClasses(Array.from(classMap.values()));
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
-        setClasses(Array.from(classMap.values()));
-      } catch (error) {
-        console.error('Error:', error);
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred. Please try again.",
-          variant: "destructive",
-        });
-      }
-    };
-
+  useEffect(() => {
     fetchClasses();
   }, [toast]);
 
@@ -82,6 +82,7 @@ export default function Dashboard() {
         classes={classes} 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        onClassDeleted={fetchClasses}
       />
     </DashboardLayout>
   );

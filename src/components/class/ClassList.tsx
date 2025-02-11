@@ -19,9 +19,15 @@ interface ClassListProps {
   classes: ClassDetails[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  onClassDeleted?: () => void;
 }
 
-export const ClassList = ({ classes, searchQuery, setSearchQuery }: ClassListProps) => {
+export const ClassList = ({ 
+  classes, 
+  searchQuery, 
+  setSearchQuery,
+  onClassDeleted 
+}: ClassListProps) => {
   const navigate = useNavigate();
 
   return (
@@ -90,6 +96,7 @@ export const ClassList = ({ classes, searchQuery, setSearchQuery }: ClassListPro
               key={index}
               classDetails={classDetails}
               onClick={() => navigate(`/class/${classDetails.className}`)}
+              onDelete={onClassDeleted}
             />
           ))}
         </div>

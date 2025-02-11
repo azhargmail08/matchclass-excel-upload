@@ -219,7 +219,15 @@ export type Database = {
           special_name?: string | null
           teacher?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_class_name"
+            columns: ["class"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["name"]
+          },
+        ]
       }
     }
     Views: {
