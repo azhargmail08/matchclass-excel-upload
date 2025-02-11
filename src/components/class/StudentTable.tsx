@@ -101,7 +101,13 @@ export const StudentTable = ({ students }: StudentTableProps) => {
                   .map((student, index) => (
                     <tr key={student._id} className="border-t">
                       <td className="px-4 py-3">{index + 1}</td>
-                      <td className="px-4 py-3">{student.name}</td>
+                      <td className="px-4 py-3">
+                        <Input
+                          value={editingStudents[student._id]?.name || student.name}
+                          onChange={(e) => handleInputChange(student._id, 'name', e.target.value)}
+                          placeholder="Student Name"
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <Input
                           value={editingStudents[student._id]?.nickname || student.nickname || ''}
@@ -117,11 +123,41 @@ export const StudentTable = ({ students }: StudentTableProps) => {
                           placeholder="Special Name"
                         />
                       </td>
-                      <td className="px-4 py-3">{student.matrix_number || '-'}</td>
-                      <td className="px-4 py-3">{student.date_joined || '-'}</td>
-                      <td className="px-4 py-3">{student.father_name || '-'}</td>
-                      <td className="px-4 py-3">{student.mother_name || '-'}</td>
-                      <td className="px-4 py-3">{student.contact_no || '-'}</td>
+                      <td className="px-4 py-3">
+                        <Input
+                          value={editingStudents[student._id]?.matrix_number || student.matrix_number || ''}
+                          onChange={(e) => handleInputChange(student._id, 'matrix_number', e.target.value)}
+                          placeholder="Matrix Number"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <Input
+                          type="date"
+                          value={editingStudents[student._id]?.date_joined || student.date_joined || ''}
+                          onChange={(e) => handleInputChange(student._id, 'date_joined', e.target.value)}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <Input
+                          value={editingStudents[student._id]?.father_name || student.father_name || ''}
+                          onChange={(e) => handleInputChange(student._id, 'father_name', e.target.value)}
+                          placeholder="Father's Name"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <Input
+                          value={editingStudents[student._id]?.mother_name || student.mother_name || ''}
+                          onChange={(e) => handleInputChange(student._id, 'mother_name', e.target.value)}
+                          placeholder="Mother's Name"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <Input
+                          value={editingStudents[student._id]?.contact_no || student.contact_no || ''}
+                          onChange={(e) => handleInputChange(student._id, 'contact_no', e.target.value)}
+                          placeholder="Contact Number"
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex justify-center gap-2">
                           <Button
@@ -151,4 +187,3 @@ export const StudentTable = ({ students }: StudentTableProps) => {
     </div>
   );
 };
-
