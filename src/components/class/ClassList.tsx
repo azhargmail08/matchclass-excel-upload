@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClassDetails } from "@/pages/Class";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,6 @@ import {
   ListFilter,
   Trash2,
   Upload,
-  X,
 } from "lucide-react";
 import {
   Dialog,
@@ -23,8 +22,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { ExcelUploader } from "@/components/ExcelUploader";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ClassListProps {
   classes: ClassDetails[];
@@ -34,6 +37,53 @@ interface ClassListProps {
 
 export const ClassList = ({ classes, searchQuery, setSearchQuery }: ClassListProps) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isNewClassDialogOpen, setIsNewClassDialogOpen] = useState(false);
+  const [newClassName, setNewClassName] = useState("");
+
+  const handleCreateClass = async () => {
+    if (!newClassName.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a class name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Create a placeholder student to establish the class
+      const { error } = await supabase
+        .from('students')
+        .insert([
+          {
+            _id: crypto.randomUUID(),
+            name: 'Placeholder Student',
+            class: newClassName.trim(),
+          }
+        ]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "New class created successfully",
+      });
+      
+      setIsNewClassDialogOpen(false);
+      setNewClassName("");
+      
+      // Force reload the page to show the new class
+      window.location.reload();
+    } catch (error) {
+      console.error('Error creating class:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create new class",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
@@ -81,12 +131,42 @@ export const ClassList = ({ classes, searchQuery, setSearchQuery }: ClassListPro
               </Dialog>
             </div>
           </div>
-          <Button 
-            className="gap-2 bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg"
-          >
-            <Plus className="w-4 h-4" />
-            New Class
-          </Button>
+          <Dialog open={isNewClassDialogOpen} onOpenChange={setIsNewClassDialogOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                className="gap-2 bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg"
+              >
+                <Plus className="w-4 h-4" />
+                New Class
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Class</DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <Label htmlFor="className">Class Name</Label>
+                <Input
+                  id="className"
+                  value={newClassName}
+                  onChange={(e) => setNewClassName(e.target.value)}
+                  placeholder="Enter class name"
+                  className="mt-2"
+                />
+              </div>
+              <DialogFooter>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsNewClassDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleCreateClass}>
+                  Create Class
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="bg-orange-50 border-l-4 border-orange-400 p-6 rounded-r-lg mb-12">
