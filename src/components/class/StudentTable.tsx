@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { format } from "date-fns";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface StudentTableProps {
   students: Student[];
@@ -21,118 +22,94 @@ export const StudentTable = ({ students }: StudentTableProps) => {
         </Button>
       </div>
       
-      <div className="bg-white rounded-lg border">
-        <div className="p-4 border-b">
-          <div className="flex justify-between items-center">
-            <Input
-              placeholder="Search Student"
-              className="max-w-sm"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <select className="border rounded-lg px-4 py-2">
-              <option>Sort A-Z</option>
-              <option>Sort Z-A</option>
-            </select>
-          </div>
+      <div className="bg-white rounded-lg border p-4">
+        <div className="flex justify-between items-center mb-4">
+          <Input
+            placeholder="Search Student"
+            className="max-w-sm"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <select className="border rounded-lg px-4 py-2">
+            <option>Sort A-Z</option>
+            <option>Sort Z-A</option>
+          </select>
         </div>
-        <div className="overflow-x-auto w-full">
-          <div className="inline-block min-w-full align-middle">
-            <div className="overflow-hidden">
-              <table className="min-w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Student Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Name on Badges
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Matrix No.
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Date Joined
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Contact No.
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Father's Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Father's ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Father's Email
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Mother's Name
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Mother's ID
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Mother's Email
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase whitespace-nowrap">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {students
-                    .filter(student => 
-                      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      (student.nickname && student.nickname.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                      (student.matrix_number && student.matrix_number.toLowerCase().includes(searchQuery.toLowerCase()))
-                    )
-                    .map((student) => (
-                      <tr key={student._id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.special_name || student.nickname || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.matrix_number || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.date_joined ? format(new Date(student.date_joined), 'dd/MM/yyyy') : '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.contact_no || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.father_name || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.father_id || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.father_email || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.mother_name || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.mother_id || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {student.mother_email || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <Button variant="ghost" size="sm">
-                            Update
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+
+        <div className="grid gap-4">
+          {students
+            .filter(student => 
+              student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              (student.nickname && student.nickname.toLowerCase().includes(searchQuery.toLowerCase())) ||
+              (student.matrix_number && student.matrix_number.toLowerCase().includes(searchQuery.toLowerCase()))
+            )
+            .map((student) => (
+              <Card key={student._id} className="w-full">
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-4">{student.name}</h3>
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-sm text-gray-500">Name on Badges:</span>
+                          <p>{student.special_name || student.nickname || '-'}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm text-gray-500">Matrix No.:</span>
+                          <p>{student.matrix_number || '-'}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm text-gray-500">Date Joined:</span>
+                          <p>{student.date_joined ? format(new Date(student.date_joined), 'dd/MM/yyyy') : '-'}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm text-gray-500">Contact No.:</span>
+                          <p>{student.contact_no || '-'}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-medium mb-2">Father's Information</h4>
+                      <div>
+                        <span className="text-sm text-gray-500">Name:</span>
+                        <p>{student.father_name || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">ID:</span>
+                        <p>{student.father_id || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">Email:</span>
+                        <p className="break-all">{student.father_email || '-'}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-medium mb-2">Mother's Information</h4>
+                      <div>
+                        <span className="text-sm text-gray-500">Name:</span>
+                        <p>{student.mother_name || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">ID:</span>
+                        <p>{student.mother_id || '-'}</p>
+                      </div>
+                      <div>
+                        <span className="text-sm text-gray-500">Email:</span>
+                        <p className="break-all">{student.mother_email || '-'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end mt-4">
+                    <Button variant="ghost" size="sm">
+                      Update
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
         </div>
       </div>
     </div>
