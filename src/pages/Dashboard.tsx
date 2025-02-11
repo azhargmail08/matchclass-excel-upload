@@ -13,25 +13,25 @@ export default function Dashboard() {
       className: "1A Mathematics",
       teacher: "John Smith",
       students: [
-        { name: "Alice Johnson", id: "1" },
-        { name: "Bob Wilson", id: "2" },
+        { name: "Alice Johnson", id: "1", class: "1A Mathematics" },
+        { name: "Bob Wilson", id: "2", class: "1A Mathematics" },
       ]
     },
     {
       className: "2B Science",
       teacher: "Sarah Davis",
       students: [
-        { name: "Charlie Brown", id: "3" },
-        { name: "Diana Evans", id: "4" },
-        { name: "Edward Mills", id: "5" },
+        { name: "Charlie Brown", id: "3", class: "2B Science" },
+        { name: "Diana Evans", id: "4", class: "2B Science" },
+        { name: "Edward Mills", id: "5", class: "2B Science" },
       ]
     },
     {
       className: "3C English",
       teacher: "Michael Lee",
       students: [
-        { name: "Frank White", id: "6" },
-        { name: "Grace Taylor", id: "7" },
+        { name: "Frank White", id: "6", class: "3C English" },
+        { name: "Grace Taylor", id: "7", class: "3C English" },
       ]
     }
   ];
