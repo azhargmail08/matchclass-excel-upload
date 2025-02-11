@@ -14,41 +14,55 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch all classes first
+        const { data: classesData, error: classesError } = await supabase
+          .from('classes')
+          .select('*');
+
+        if (classesError) throw classesError;
+
+        // Then fetch all students
+        const { data: studentsData, error: studentsError } = await supabase
           .from('students')
           .select('*');
 
-        if (error) {
-          console.error('Error fetching classes:', error);
-          toast({
-            title: "Error",
-            description: "Failed to load classes. Please try again.",
-            variant: "destructive",
-          });
-          return;
-        }
+        if (studentsError) throw studentsError;
 
-        if (data) {
-          // Group students by class and create ClassDetails objects
-          const classGroups = data.reduce((acc: { [key: string]: ClassDetails }, student) => {
-            if (!acc[student.class]) {
-              acc[student.class] = {
-                className: student.class,
-                teacher: student.teacher || 'Unassigned',
-                students: []
-              };
-            }
-            acc[student.class].students.push({
+        // Create a map of classes with their students
+        const classMap = new Map<string, ClassDetails>();
+
+        // First, add all classes from the classes table
+        classesData?.forEach(classItem => {
+          classMap.set(classItem.name, {
+            className: classItem.name,
+            teacher: classItem.teacher || 'Unassigned',
+            students: []
+          });
+        });
+
+        // Then, add any classes that only exist in the students table
+        studentsData?.forEach(student => {
+          if (!classMap.has(student.class)) {
+            classMap.set(student.class, {
+              className: student.class,
+              teacher: student.teacher || 'Unassigned',
+              students: []
+            });
+          }
+          
+          // Add student to their class
+          const classDetails = classMap.get(student.class);
+          if (classDetails) {
+            classDetails.students.push({
               _id: student._id,
               name: student.name,
               class: student.class,
               nickname: student.nickname
             });
-            return acc;
-          }, {});
+          }
+        });
 
-          setClasses(Object.values(classGroups));
-        }
+        setClasses(Array.from(classMap.values()));
       } catch (error) {
         console.error('Error:', error);
         toast({

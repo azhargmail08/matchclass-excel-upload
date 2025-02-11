@@ -32,12 +32,10 @@ export const CreateClassDialog = () => {
 
     try {
       const { error } = await supabase
-        .from('students')
+        .from('classes')
         .insert([
           {
-            _id: crypto.randomUUID(),
-            name: 'Placeholder Student',
-            class: newClassName.trim(),
+            name: newClassName.trim(),
           }
         ]);
 
