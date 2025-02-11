@@ -163,14 +163,14 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-8">
+    <div className="w-full mx-auto mt-4 px-4 sm:px-6 lg:px-8 max-w-5xl">
       <Card className="bg-white">
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Data Comparison Results
           </h2>
-          <ScrollArea className="h-[calc(100vh-300px)]">
-            <div className="space-y-6">
+          <ScrollArea className="h-[60vh] sm:h-[70vh]">
+            <div className="space-y-4 sm:space-y-6">
               {comparisonResults.map((result, index) => (
                 <ComparisonResult
                   key={index}
