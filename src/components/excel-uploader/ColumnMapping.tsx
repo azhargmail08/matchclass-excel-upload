@@ -50,7 +50,7 @@ export const ColumnMapping = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="h-[80vh] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Map Excel Columns</DialogTitle>
         </DialogHeader>
@@ -108,3 +108,4 @@ export const ColumnMapping = ({
     </Dialog>
   );
 };
+
