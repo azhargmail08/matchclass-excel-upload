@@ -109,7 +109,7 @@ export const StudentTable = ({ students }: StudentTableProps) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="space-y-4">
                       {renderEditableField(student, 'name', 'Name')}
-                      {renderEditableField(student, 'nickname', 'Nickname')}
+                      {renderEditableField(student, 'nickname', 'Name on Badge')}
                       {renderEditableField(student, 'matrix_number', 'Matrix No.')}
                       {renderEditableField(student, 'contact_no', 'Contact No.')}
                     </div>
@@ -147,3 +147,4 @@ export const StudentTable = ({ students }: StudentTableProps) => {
     </div>
   );
 };
+
