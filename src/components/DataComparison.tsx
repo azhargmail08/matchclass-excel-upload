@@ -105,6 +105,30 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         return;
       }
 
+      // First, ensure the external students exist in the external_students table
+      for (const result of selectedResults) {
+        if (!result.selectedMatch) continue;
+
+        const { data: existingExternalStudent } = await supabase
+          .from('external_students')
+          .select('_id')
+          .eq('_id', result.selectedMatch._id)
+          .single();
+
+        if (!existingExternalStudent) {
+          // Insert into external_students if not exists
+          const { error: insertError } = await supabase
+            .from('external_students')
+            .insert({
+              _id: result.selectedMatch._id,
+              name: result.selectedMatch.name,
+              class: result.selectedMatch.class
+            });
+
+          if (insertError) throw insertError;
+        }
+      }
+
       const { data: batchData, error: batchError } = await supabase
         .from('data_sync_batches')
         .insert({
@@ -119,7 +143,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       const syncRecords = selectedResults.map(result => ({
         batch_id: batchData.id,
         student_id: result.selectedMatch!._id,
-        external_student_id: result.selectedMatch!._id, // Updated: Using _id instead of name
+        external_student_id: result.selectedMatch!._id,
         status: 'pending'
       }));
 
@@ -196,4 +220,3 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
     </div>
   );
 };
-
