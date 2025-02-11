@@ -58,7 +58,7 @@ export const StudentTable = ({ students }: StudentTableProps) => {
   };
 
   return (
-    <div className="space-y-6 max-w-full">
+    <div className="space-y-6">
       <div className="flex justify-between items-center">
         <Input
           placeholder="Search Student"
@@ -72,9 +72,9 @@ export const StudentTable = ({ students }: StudentTableProps) => {
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow max-w-full">
+      <div className="bg-white rounded-lg shadow">
         <ScrollArea className="h-[400px]">
-          <div className="overflow-x-auto relative">
+          <div className="overflow-x-auto">
             <table className="w-full min-w-[1500px]">
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
