@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Class from "./pages/Class";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 // Move queryClient instantiation outside of component
 const queryClient = new QueryClient();
@@ -62,7 +63,9 @@ function App() {
               path="/class/:className"
               element={
                 <ProtectedRoute>
-                  <Class />
+                  <DashboardLayout onClassClick={() => {}}>
+                    <Class />
+                  </DashboardLayout>
                 </ProtectedRoute>
               }
             />
