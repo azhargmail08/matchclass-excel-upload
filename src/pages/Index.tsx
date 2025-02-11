@@ -24,8 +24,10 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    const classes = [...new Set(students.map(student => student.class))].sort();
-    setUniqueClasses(classes);
+    if (students.length > 0) {
+      const classes = Array.from(new Set(students.map(student => student.class))).sort();
+      setUniqueClasses(classes);
+    }
   }, [students]);
 
   const fetchStudents = async () => {
@@ -68,14 +70,17 @@ const Index = () => {
   };
 
   const findMatches = (data: ExcelRow[]): MatchResult[] => {
-    return data.map((row) => ({
-      excelRow: row,
-      matches: students.filter(
+    return data.map((row) => {
+      const matchingStudents = students.filter(
         (student) =>
           student.name.toLowerCase().includes(row.name.toLowerCase()) ||
           student.class.toLowerCase() === row.class.toLowerCase()
-      ),
-    }));
+      );
+      return {
+        excelRow: row,
+        matches: matchingStudents,
+      };
+    });
   };
 
   const handleDataUpload = (data: ExcelRow[]) => {
@@ -129,7 +134,7 @@ const Index = () => {
             class: change.old_class,
             nickname: change.old_nickname,
           })
-          .eq('id', change.student_id);
+          .eq('_id', change.student_id);
 
         if (updateError) throw updateError;
 
@@ -221,4 +226,3 @@ const Index = () => {
 };
 
 export default Index;
-
