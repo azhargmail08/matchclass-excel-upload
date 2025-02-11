@@ -1,18 +1,10 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { MatchResult } from "@/types";
-import { toast } from "@/hooks/use-toast";
 
 export const updateStudentData = async (selectedMatches: MatchResult[]) => {
   const { data: session } = await supabase.auth.getSession();
-  if (!session.session) {
-    toast({
-      title: "Error",
-      description: "You must be logged in to make changes",
-      variant: "destructive",
-    });
-    return false;
-  }
+  if (!session.session) return false;
 
   const batchId = crypto.randomUUID();
 
