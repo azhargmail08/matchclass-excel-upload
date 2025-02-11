@@ -1,3 +1,4 @@
+
 import { Student } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,7 @@ export const StudentTable = ({ students }: StudentTableProps) => {
 
       <div className="relative rounded-lg shadow border">
         <div className="overflow-auto">
-          <table className="w-full border-collapse min-w-[1500px]">
+          <table className="w-full border-collapse">
             <thead className="bg-gray-50 sticky top-0 z-10">
               <tr>
                 <th className="w-12 px-4 py-3 text-left">No.</th>
