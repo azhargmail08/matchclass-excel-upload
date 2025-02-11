@@ -7,6 +7,7 @@ import { Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StudentTableProps {
   students: Student[];
@@ -16,6 +17,7 @@ export const StudentTable = ({ students }: StudentTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStudents, setEditingStudents] = useState<{ [key: string]: Student }>({});
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleInputChange = (studentId: string, field: keyof Student, value: string) => {
     setEditingStudents(prev => ({
@@ -58,22 +60,22 @@ export const StudentTable = ({ students }: StudentTableProps) => {
   };
 
   return (
-    <div className="space-y-6 max-w-full">
-      <div className="flex justify-between items-center">
+    <div className="space-y-4 w-full">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <Input
           placeholder="Search Student"
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <select className="border rounded-lg px-4 py-2">
+        <select className="border rounded-lg px-4 py-2 w-full sm:w-auto">
           <option>Sort A-Z</option>
           <option>Sort Z-A</option>
         </select>
       </div>
 
-      <div className="relative rounded-lg shadow border">
-        <ScrollArea className="h-[600px]">
+      <div className="relative rounded-lg shadow border bg-white">
+        <ScrollArea className="h-[calc(100vh-300px)]">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse min-w-[1200px]">
               <thead className="bg-gray-50 sticky top-0 z-10">
@@ -149,3 +151,4 @@ export const StudentTable = ({ students }: StudentTableProps) => {
     </div>
   );
 };
+
