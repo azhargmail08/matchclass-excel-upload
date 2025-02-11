@@ -73,8 +73,8 @@ export const StudentTable = ({ students }: StudentTableProps) => {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="h-[400px] overflow-x-auto">
-          <ScrollArea className="h-full">
+        <ScrollArea className="h-[400px]">
+          <div className="overflow-x-auto">
             <table className="w-full min-w-[1500px]">
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
@@ -143,8 +143,8 @@ export const StudentTable = ({ students }: StudentTableProps) => {
                   ))}
               </tbody>
             </table>
-          </ScrollArea>
-        </div>
+          </div>
+        </ScrollArea>
       </div>
     </div>
   );
