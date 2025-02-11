@@ -4,10 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { findSimilarNames } from "@/utils/nameMatching";
 import { ExcelRow, Student } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { ComparisonResult } from "./comparison/ComparisonResult";
 
 interface DataComparisonProps {
   excelData: ExcelRow[];
@@ -95,7 +95,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         return;
       }
 
-      // Create a new batch
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) {
         toast({
@@ -117,7 +116,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
 
       if (batchError) throw batchError;
 
-      // Create sync records
       const syncRecords = selectedResults.map(result => ({
         batch_id: batchData.id,
         student_id: result.selectedMatch!._id,
@@ -131,7 +129,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
 
       if (syncError) throw syncError;
 
-      // Update student records
       for (const result of selectedResults) {
         const { error: updateError } = await supabase
           .from('students')
@@ -149,7 +146,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         description: "Selected records have been updated",
       });
 
-      // Clear selections
       setSelectedRows({});
       
       if (onUpdateComplete) {
@@ -176,54 +172,15 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
           <ScrollArea className="h-[calc(100vh-300px)]">
             <div className="space-y-6">
               {comparisonResults.map((result, index) => (
-                <div key={index} className="border-b border-gray-200 pb-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-grow">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={selectedRows[index] || false}
-                              onCheckedChange={(checked) => handleCheckboxChange(index, checked as boolean)}
-                            />
-                            <h3 className="font-medium text-gray-700">Excel Entry:</h3>
-                          </div>
-                          <div className="bg-gray-50 p-3 rounded">
-                            <p>{result.excelEntry.name}</p>
-                            <p className="text-sm text-gray-500">{result.excelEntry.class}</p>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <h3 className="font-medium text-gray-700">Possible Matches:</h3>
-                          <div className="bg-gray-50 p-3 rounded space-y-2">
-                            {result.matches.length > 0 ? (
-                              result.matches.map((match) => (
-                                <div key={match._id} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    checked={result.selectedMatch?._id === match._id}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        handleMatchSelect(index, match);
-                                      } else {
-                                        handleMatchSelect(index, undefined);
-                                      }
-                                    }}
-                                  />
-                                  <div>
-                                    <p>{match.name}</p>
-                                    <p className="text-sm text-gray-500">{match.class}</p>
-                                  </div>
-                                </div>
-                              ))
-                            ) : (
-                              <p className="text-sm text-gray-500">No matches found</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ComparisonResult
+                  key={index}
+                  excelEntry={result.excelEntry}
+                  matches={result.matches}
+                  selectedMatch={result.selectedMatch}
+                  isSelected={selectedRows[index] || false}
+                  onMatchSelect={(student) => handleMatchSelect(index, student)}
+                  onRowSelect={(checked) => handleCheckboxChange(index, checked)}
+                />
               ))}
             </div>
           </ScrollArea>
