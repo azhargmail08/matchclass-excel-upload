@@ -128,7 +128,7 @@ const Class = () => {
           </CardContent>
         </Card>
 
-        <p className="text-sm text-gray-600 mb-8">Total Of 56 Class(es)</p>
+        <p className="text-sm text-gray-600 mb-8">Total Of 2 Class(es): Level 1</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {Array.from({ length: 2 }).map((_, index) => (
@@ -136,9 +136,13 @@ const Class = () => {
               key={index} 
               className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-100"
             >
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                {index === 0 ? "1 ALIA" : "1 AMANAH"}
-              </h3>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xl font-semibold text-gray-800">Level 1</span>
+                <span className="text-xl font-semibold text-gray-800">-</span>
+                <h3 className="text-xl font-semibold text-gray-800">
+                  {index === 0 ? "ALIA" : "AMANAH"}
+                </h3>
+              </div>
               <div className="space-y-3 mb-6">
                 <p className="text-sm flex items-center">
                   <span className="text-gray-500 min-w-20">Level:</span>
