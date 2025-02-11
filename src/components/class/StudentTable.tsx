@@ -73,16 +73,16 @@ export const StudentTable = ({ students }: StudentTableProps) => {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="h-[400px]"> {/* Fixed height container */}
+        <div className="h-[400px] overflow-x-auto"> {/* Added overflow-x-auto for horizontal scrolling */}
           <ScrollArea className="h-full">
-            <table className="w-full">
+            <table className="w-full min-w-[800px]"> {/* Added min-width to ensure horizontal scroll */}
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
                   <th className="w-12 px-4 py-3 text-left">No.</th>
-                  <th className="px-4 py-3 text-left">Student Name</th>
-                  <th className="px-4 py-3 text-left">Name on Badges (Max 14 Letters)</th>
-                  <th className="px-4 py-3 text-left">Special Name</th>
-                  <th className="px-4 py-3 text-center">Action</th>
+                  <th className="px-4 py-3 text-left min-w-[200px]">Student Name</th>
+                  <th className="px-4 py-3 text-left min-w-[200px]">Name on Badges (Max 14 Letters)</th>
+                  <th className="px-4 py-3 text-left min-w-[200px]">Special Name</th>
+                  <th className="px-4 py-3 text-center min-w-[120px]">Action</th>
                 </tr>
               </thead>
               <tbody>
