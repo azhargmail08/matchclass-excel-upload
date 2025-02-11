@@ -74,7 +74,7 @@ export const StudentTable = ({ students }: StudentTableProps) => {
 
       <div className="bg-white rounded-lg shadow border">
         <ScrollArea className="h-[600px] rounded-md">
-          <div className="relative">
+          <div className="min-w-[1200px]">
             <table className="w-full border-collapse">
               <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
