@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { DropZone } from "./excel-uploader/DropZone";
 import { ColumnMapping as ColumnMappingDialog } from "./excel-uploader/ColumnMapping";
 import { processExcelData, validateProcessedData } from "./excel-uploader/utils";
+import { DataComparison } from "./DataComparison";
 
 interface ExcelUploaderProps {
   onDataUpload: (data: ExcelRow[]) => void;
@@ -15,12 +16,13 @@ export const ExcelUploader = ({ onDataUpload }: ExcelUploaderProps) => {
   const [availableColumns, setAvailableColumns] = useState<string[]>([]);
   const [columnMapping, setColumnMapping] = useState<ColumnMapping>({ name: "", class: "" });
   const [rawData, setRawData] = useState<any[]>([]);
+  const [processedData, setProcessedData] = useState<ExcelRow[]>([]);
   const { toast } = useToast();
 
   const handleConfirmMapping = () => {
-    const processedData = processExcelData(columnMapping, rawData);
+    const processed = processExcelData(columnMapping, rawData);
 
-    if (!validateProcessedData(processedData)) {
+    if (!validateProcessedData(processed)) {
       toast({
         title: "Error",
         description: "Some rows contain empty values after mapping",
@@ -29,11 +31,8 @@ export const ExcelUploader = ({ onDataUpload }: ExcelUploaderProps) => {
       return;
     }
 
-    onDataUpload(processedData);
-    toast({
-      title: "Success",
-      description: `Uploaded ${processedData.length} records successfully`,
-    });
+    setProcessedData(processed);
+    onDataUpload(processed);
     setShowMapping(false);
   };
 
@@ -55,6 +54,10 @@ export const ExcelUploader = ({ onDataUpload }: ExcelUploaderProps) => {
         onColumnMappingChange={setColumnMapping}
         onConfirm={handleConfirmMapping}
       />
+
+      {processedData.length > 0 && (
+        <DataComparison excelData={processedData} />
+      )}
     </>
   );
 };
