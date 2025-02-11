@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Student } from "@/types";
 import { ClassList } from "@/components/class/ClassList";
 import { ClassDetailsView } from "@/components/class/ClassDetails";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 export interface ClassDetails {
   className: string;
@@ -54,18 +56,20 @@ const Class = () => {
     fetchClassesAndStudents();
   }, [className]);
 
-  // If we have a className parameter, show the class details view
-  if (className && selectedClass) {
-    return <ClassDetailsView classDetails={selectedClass} />;
-  }
-
-  // Otherwise show the classes list view
-  return (
+  const content = className && selectedClass ? (
+    <ClassDetailsView classDetails={selectedClass} />
+  ) : (
     <ClassList 
       classes={classes}
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
     />
+  );
+
+  return (
+    <DashboardLayout onClassClick={() => {}}>
+      {content}
+    </DashboardLayout>
   );
 };
 
