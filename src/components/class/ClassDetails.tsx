@@ -13,13 +13,17 @@ interface ClassDetailsProps {
 export const ClassDetailsView = ({ classDetails }: ClassDetailsProps) => {
   const navigate = useNavigate();
 
+  const handleBack = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/dashboard')}
+            onClick={handleBack}
             className="gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
