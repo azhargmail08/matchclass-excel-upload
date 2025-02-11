@@ -72,11 +72,11 @@ export const StudentTable = ({ students }: StudentTableProps) => {
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <ScrollArea className="h-[400px]">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1500px]">
-              <thead className="bg-gray-50 sticky top-0">
+      <div className="bg-white rounded-lg shadow border">
+        <ScrollArea className="h-[600px] rounded-md">
+          <div className="relative">
+            <table className="w-full border-collapse">
+              <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
                   <th className="w-12 px-4 py-3 text-left">No.</th>
                   <th className="px-4 py-3 text-left min-w-[200px]">Student Name</th>
