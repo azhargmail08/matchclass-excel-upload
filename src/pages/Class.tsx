@@ -15,7 +15,7 @@ import {
   ListFilter,
   Trash2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Class = () => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -74,10 +74,7 @@ const Class = () => {
         </div>
 
         <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg text-gray-700">Filters</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="relative">
                 <label className="text-sm font-medium mb-2 block text-gray-700">Class Level</label>
