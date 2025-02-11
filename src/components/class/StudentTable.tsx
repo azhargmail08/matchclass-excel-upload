@@ -1,4 +1,3 @@
-
 import { Student } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,9 +72,9 @@ export const StudentTable = ({ students }: StudentTableProps) => {
       </div>
 
       <div className="relative rounded-lg shadow border">
-        <ScrollArea className="h-[600px]">
-          <div className="w-full">
-            <table className="w-full border-collapse">
+        <ScrollArea className="h-[600px]" style={{ overflow: 'hidden' }}>
+          <div style={{ width: '100%', overflowX: 'auto' }}>
+            <table className="w-full border-collapse min-w-[1200px]">
               <thead className="bg-gray-50 sticky top-0 z-10">
                 <tr>
                   <th className="w-12 px-4 py-3 text-left">No.</th>
@@ -149,4 +148,3 @@ export const StudentTable = ({ students }: StudentTableProps) => {
     </div>
   );
 };
-
