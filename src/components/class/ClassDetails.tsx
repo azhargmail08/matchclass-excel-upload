@@ -5,17 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Plus } from "lucide-react";
 import { StudentTable } from "./StudentTable";
+import { useEffect } from "react";
 
 interface ClassDetailsProps {
   classDetails: ClassDetailsType;
+  onRefresh?: () => void;
 }
 
-export const ClassDetailsView = ({ classDetails }: ClassDetailsProps) => {
+export const ClassDetailsView = ({ classDetails, onRefresh }: ClassDetailsProps) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
     navigate('/dashboard');
   };
+
+  useEffect(() => {
+    // Refresh data when component mounts
+    onRefresh?.();
+  }, [onRefresh]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">

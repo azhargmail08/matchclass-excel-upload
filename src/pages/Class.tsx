@@ -22,46 +22,46 @@ const Class = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchClassDetails = async () => {
-      try {
-        // First fetch the class details
-        const { data: classData, error: classError } = await supabase
-          .from('classes')
-          .select('*')
-          .eq('name', className)
-          .maybeSingle();
+  const fetchClassDetails = async () => {
+    try {
+      // First fetch the class details
+      const { data: classData, error: classError } = await supabase
+        .from('classes')
+        .select('*')
+        .eq('name', className)
+        .maybeSingle();
 
-        if (classError) throw classError;
+      if (classError) throw classError;
 
-        if (!classData) {
-          setNotFound(true);
-          return;
-        }
-
-        // Then fetch students for this class
-        const { data: studentsData, error: studentsError } = await supabase
-          .from('students')
-          .select('*')
-          .eq('class', className);
-
-        if (studentsError) throw studentsError;
-
-        setSelectedClass({
-          className: className || '',
-          teacher: classData?.teacher || 'Unassigned',
-          students: studentsData || []
-        });
-      } catch (error) {
-        console.error('Error fetching class details:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load class details. Please try again.",
-          variant: "destructive",
-        });
+      if (!classData) {
+        setNotFound(true);
+        return;
       }
-    };
 
+      // Then fetch students for this class
+      const { data: studentsData, error: studentsError } = await supabase
+        .from('students')
+        .select('*')
+        .eq('class', className);
+
+      if (studentsError) throw studentsError;
+
+      setSelectedClass({
+        className: className || '',
+        teacher: classData?.teacher || 'Unassigned',
+        students: studentsData || []
+      });
+    } catch (error) {
+      console.error('Error fetching class details:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load class details. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
     if (className) {
       fetchClassDetails();
     }
@@ -90,9 +90,11 @@ const Class = () => {
   }
 
   return className && selectedClass ? (
-    <ClassDetailsView classDetails={selectedClass} />
+    <ClassDetailsView 
+      classDetails={selectedClass} 
+      onRefresh={fetchClassDetails}
+    />
   ) : null;
 };
 
 export default Class;
-
