@@ -49,6 +49,7 @@ export const ClassList = ({ classes, searchQuery, setSearchQuery }: ClassListPro
               <Button 
                 variant="outline" 
                 className="gap-2 hover:bg-gray-50 transition-all duration-200"
+                onClick={() => navigate('/')}
               >
                 <Upload className="w-4 h-4" />
                 Update Students
