@@ -98,18 +98,21 @@ export type Database = {
           id: string
           name: string
           nickname: string | null
+          teacher: string | null
         }
         Insert: {
           class: string
           id?: string
           name: string
           nickname?: string | null
+          teacher?: string | null
         }
         Update: {
           class?: string
           id?: string
           name?: string
           nickname?: string | null
+          teacher?: string | null
         }
         Relationships: []
       }
