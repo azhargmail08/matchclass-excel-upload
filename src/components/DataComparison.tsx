@@ -6,6 +6,8 @@ import { ExcelRow, Student } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 
 interface DataComparisonProps {
   excelData: ExcelRow[];
@@ -166,46 +168,57 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
 
   return (
     <div className="w-full max-w-4xl mx-auto mt-8">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <Card className="bg-white">
         <div className="p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Data Comparison Results
           </h2>
-          <div className="h-[calc(100vh-300px)] overflow-y-auto">
+          <ScrollArea className="h-[calc(100vh-300px)]">
             <div className="space-y-6">
               {comparisonResults.map((result, index) => (
                 <div key={index} className="border-b border-gray-200 pb-4">
                   <div className="flex items-start space-x-4">
-                    <Checkbox
-                      checked={selectedRows[index] || false}
-                      onCheckedChange={(checked) => handleCheckboxChange(index, checked as boolean)}
-                    />
                     <div className="flex-grow">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <h3 className="font-medium text-gray-700">Excel Entry:</h3>
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={selectedRows[index] || false}
+                              onCheckedChange={(checked) => handleCheckboxChange(index, checked as boolean)}
+                            />
+                            <h3 className="font-medium text-gray-700">Excel Entry:</h3>
+                          </div>
                           <div className="bg-gray-50 p-3 rounded">
                             <p>{result.excelEntry.name}</p>
                             <p className="text-sm text-gray-500">{result.excelEntry.class}</p>
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <h3 className="font-medium text-gray-700">Select Match:</h3>
-                          <select
-                            className="w-full p-2 text-sm border border-gray-300 rounded-md"
-                            value={result.selectedMatch?._id || ""}
-                            onChange={(e) => {
-                              const selected = result.matches.find(m => m._id === e.target.value);
-                              handleMatchSelect(index, selected);
-                            }}
-                          >
-                            <option value="">Select a match...</option>
-                            {result.matches.map((match) => (
-                              <option key={match._id} value={match._id}>
-                                {match.name} ({match.class})
-                              </option>
-                            ))}
-                          </select>
+                          <h3 className="font-medium text-gray-700">Possible Matches:</h3>
+                          <div className="bg-gray-50 p-3 rounded space-y-2">
+                            {result.matches.length > 0 ? (
+                              result.matches.map((match) => (
+                                <div key={match._id} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    checked={result.selectedMatch?._id === match._id}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        handleMatchSelect(index, match);
+                                      } else {
+                                        handleMatchSelect(index, undefined);
+                                      }
+                                    }}
+                                  />
+                                  <div>
+                                    <p>{match.name}</p>
+                                    <p className="text-sm text-gray-500">{match.class}</p>
+                                  </div>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-sm text-gray-500">No matches found</p>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -213,7 +226,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
                 </div>
               ))}
             </div>
-          </div>
+          </ScrollArea>
         </div>
         <div className="p-4 bg-gray-50 border-t border-gray-200">
           <div className="flex justify-end">
@@ -222,7 +235,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
             </Button>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
