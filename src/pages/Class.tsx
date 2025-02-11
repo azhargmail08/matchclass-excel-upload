@@ -15,6 +15,7 @@ import {
   ListFilter,
   Trash2
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Class = () => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -72,37 +73,42 @@ const Class = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="relative">
-            <label className="text-sm font-medium mb-2 block text-gray-700">Class Level</label>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="text-lg text-gray-700">Filters</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="relative">
-              <button className="w-full flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 text-left hover:border-blue-400 transition-colors shadow-sm">
-                <span className="text-gray-500">Nothing Selected</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </button>
+              <label className="text-sm font-medium mb-2 block text-gray-700">Class Level</label>
+              <div className="relative">
+                <button className="w-full flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 text-left hover:border-blue-400 transition-colors">
+                  <span className="text-gray-500">Nothing Selected</span>
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="relative">
-            <label className="text-sm font-medium mb-2 block text-gray-700">Class Year</label>
             <div className="relative">
-              <button className="w-full flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 text-left hover:border-blue-400 transition-colors shadow-sm">
-                <span className="text-gray-500">Nothing Selected</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </button>
+              <label className="text-sm font-medium mb-2 block text-gray-700">Class Year</label>
+              <div className="relative">
+                <button className="w-full flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 text-left hover:border-blue-400 transition-colors">
+                  <span className="text-gray-500">Nothing Selected</span>
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="relative">
-            <label className="text-sm font-medium mb-2 block text-gray-700">Class Status</label>
             <div className="relative">
-              <button className="w-full flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 text-left hover:border-blue-400 transition-colors shadow-sm">
-                <span className="text-gray-500">Nothing Selected</span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </button>
+              <label className="text-sm font-medium mb-2 block text-gray-700">Class Status</label>
+              <div className="relative">
+                <button className="w-full flex items-center justify-between bg-white border rounded-lg px-4 py-2.5 text-left hover:border-blue-400 transition-colors">
+                  <span className="text-gray-500">Nothing Selected</span>
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
@@ -171,3 +177,4 @@ const Class = () => {
 };
 
 export default Class;
+
