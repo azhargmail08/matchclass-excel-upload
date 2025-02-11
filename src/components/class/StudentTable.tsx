@@ -73,15 +73,20 @@ export const StudentTable = ({ students }: StudentTableProps) => {
       </div>
 
       <div className="bg-white rounded-lg shadow">
-        <div className="h-[400px] overflow-x-auto"> {/* Added overflow-x-auto for horizontal scrolling */}
+        <div className="h-[400px] overflow-x-auto">
           <ScrollArea className="h-full">
-            <table className="w-full min-w-[800px]"> {/* Added min-width to ensure horizontal scroll */}
+            <table className="w-full min-w-[1500px]">
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
                   <th className="w-12 px-4 py-3 text-left">No.</th>
                   <th className="px-4 py-3 text-left min-w-[200px]">Student Name</th>
-                  <th className="px-4 py-3 text-left min-w-[200px]">Name on Badges (Max 14 Letters)</th>
-                  <th className="px-4 py-3 text-left min-w-[200px]">Special Name</th>
+                  <th className="px-4 py-3 text-left min-w-[200px]">Name on Badges</th>
+                  <th className="px-4 py-3 text-left min-w-[150px]">Special Name</th>
+                  <th className="px-4 py-3 text-left min-w-[150px]">Matrix Number</th>
+                  <th className="px-4 py-3 text-left min-w-[150px]">Date Joined</th>
+                  <th className="px-4 py-3 text-left min-w-[200px]">Father's Name</th>
+                  <th className="px-4 py-3 text-left min-w-[200px]">Mother's Name</th>
+                  <th className="px-4 py-3 text-left min-w-[150px]">Contact No</th>
                   <th className="px-4 py-3 text-center min-w-[120px]">Action</th>
                 </tr>
               </thead>
@@ -110,6 +115,11 @@ export const StudentTable = ({ students }: StudentTableProps) => {
                           placeholder="Special Name"
                         />
                       </td>
+                      <td className="px-4 py-3">{student.matrix_number || '-'}</td>
+                      <td className="px-4 py-3">{student.date_joined || '-'}</td>
+                      <td className="px-4 py-3">{student.father_name || '-'}</td>
+                      <td className="px-4 py-3">{student.mother_name || '-'}</td>
+                      <td className="px-4 py-3">{student.contact_no || '-'}</td>
                       <td className="px-4 py-3">
                         <div className="flex justify-center gap-2">
                           <Button
