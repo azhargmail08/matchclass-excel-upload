@@ -17,7 +17,7 @@ export const updateStudentData = async (selectedMatches: MatchResult[]) => {
   const batchId = crypto.randomUUID();
 
   const changes = selectedMatches.map(match => ({
-    student_id: match.selected!.id,
+    student_id: match.selected!._id,
     old_name: match.selected!.name,
     old_class: match.selected!.class,
     old_nickname: match.selected!.nickname,
@@ -41,7 +41,7 @@ export const updateStudentData = async (selectedMatches: MatchResult[]) => {
         name: match.excelRow.name,
         class: match.excelRow.class,
       })
-      .eq('id', match.selected!.id);
+      .eq('_id', match.selected!._id);
 
     if (updateError) throw updateError;
   }

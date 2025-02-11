@@ -88,30 +88,60 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "students"
-            referencedColumns: ["id"]
+            referencedColumns: ["_id"]
           },
         ]
       }
       students: {
         Row: {
+          _id: string
           class: string
-          id: string
+          contact_no: string | null
+          date_joined: string | null
+          father_email: string | null
+          father_id: string | null
+          father_name: string | null
+          matrix_number: string | null
+          mother_email: string | null
+          mother_id: string | null
+          mother_name: string | null
           name: string
           nickname: string | null
+          special_name: string | null
           teacher: string | null
         }
         Insert: {
+          _id: string
           class: string
-          id?: string
+          contact_no?: string | null
+          date_joined?: string | null
+          father_email?: string | null
+          father_id?: string | null
+          father_name?: string | null
+          matrix_number?: string | null
+          mother_email?: string | null
+          mother_id?: string | null
+          mother_name?: string | null
           name: string
           nickname?: string | null
+          special_name?: string | null
           teacher?: string | null
         }
         Update: {
+          _id?: string
           class?: string
-          id?: string
+          contact_no?: string | null
+          date_joined?: string | null
+          father_email?: string | null
+          father_id?: string | null
+          father_name?: string | null
+          matrix_number?: string | null
+          mother_email?: string | null
+          mother_id?: string | null
+          mother_name?: string | null
           name?: string
           nickname?: string | null
+          special_name?: string | null
           teacher?: string | null
         }
         Relationships: []
