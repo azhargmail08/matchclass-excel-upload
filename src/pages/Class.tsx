@@ -1,11 +1,13 @@
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Student } from "@/types";
-import { ClassList } from "@/components/class/ClassList";
 import { ClassDetailsView } from "@/components/class/ClassDetails";
 import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export interface ClassDetails {
   className: string;
@@ -16,7 +18,9 @@ export interface ClassDetails {
 const Class = () => {
   const { className } = useParams();
   const [selectedClass, setSelectedClass] = useState<ClassDetails | null>(null);
+  const [notFound, setNotFound] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClassDetails = async () => {
@@ -26,10 +30,13 @@ const Class = () => {
           .from('classes')
           .select('*')
           .eq('name', className)
-          .single();
+          .maybeSingle();
 
-        if (classError && classError.code !== 'PGRST116') {
-          throw classError;
+        if (classError) throw classError;
+
+        if (!classData) {
+          setNotFound(true);
+          return;
         }
 
         // Then fetch students for this class
@@ -60,9 +67,32 @@ const Class = () => {
     }
   }, [className, toast]);
 
+  if (notFound) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-8">
+        <div className="max-w-7xl mx-auto">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/dashboard')}
+            className="mb-8 gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Button>
+          <Alert>
+            <AlertDescription>
+              Class "{className}" was not found in the database.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
+
   return className && selectedClass ? (
     <ClassDetailsView classDetails={selectedClass} />
   ) : null;
 };
 
 export default Class;
+
