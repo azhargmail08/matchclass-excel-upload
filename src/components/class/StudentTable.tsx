@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface StudentTableProps {
@@ -74,9 +73,9 @@ export const StudentTable = ({ students }: StudentTableProps) => {
         </select>
       </div>
 
-      <div className="relative rounded-lg shadow border bg-white overflow-hidden">
-        <ScrollArea className="h-[calc(100vh-300px)]">
-          <div className="overflow-x-auto min-w-full">
+      <div className="relative rounded-lg shadow border bg-white">
+        <div className="h-[calc(100vh-300px)] overflow-y-auto">
+          <div className="overflow-x-auto">
             <div className="inline-block min-w-full align-middle">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -184,9 +183,8 @@ export const StudentTable = ({ students }: StudentTableProps) => {
               </table>
             </div>
           </div>
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );
 };
-
