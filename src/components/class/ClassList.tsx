@@ -14,6 +14,7 @@ import {
   Eye,
   ListFilter,
   Trash2,
+  Upload,
 } from "lucide-react";
 
 interface ClassListProps {
@@ -37,13 +38,22 @@ export const ClassList = ({ classes, searchQuery, setSearchQuery }: ClassListPro
             <p className="text-gray-600 mb-6">
               Such As Add Class, Transfer Student And Assign Teacher
             </p>
-            <Button 
-              variant="outline" 
-              className="gap-2 hover:bg-gray-50 transition-all duration-200"
-            >
-              <Download className="w-4 h-4" />
-              Download Class QR
-            </Button>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                className="gap-2 hover:bg-gray-50 transition-all duration-200"
+              >
+                <Download className="w-4 h-4" />
+                Download Class QR
+              </Button>
+              <Button 
+                variant="outline" 
+                className="gap-2 hover:bg-gray-50 transition-all duration-200"
+              >
+                <Upload className="w-4 h-4" />
+                Update Students
+              </Button>
+            </div>
           </div>
           <Button 
             className="gap-2 bg-blue-600 hover:bg-blue-700 transition-colors shadow-lg"
