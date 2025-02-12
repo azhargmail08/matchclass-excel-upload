@@ -24,7 +24,6 @@ export const ComparisonResult = ({
       <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 space-y-4 sm:space-y-0">
         <div className="flex-1">
           <div className="space-y-2">
-            <h3 className="font-medium text-gray-700">Excel Entry:</h3>
             <div className="bg-gray-50 p-3 rounded">
               <div className="flex items-start space-x-2">
                 <Checkbox
@@ -41,7 +40,6 @@ export const ComparisonResult = ({
                 />
                 <div className="flex-1">
                   <p className="break-words">{excelEntry.name}</p>
-                  <p className="text-sm text-gray-500 break-words">{excelEntry.class}</p>
                 </div>
               </div>
             </div>
@@ -49,7 +47,6 @@ export const ComparisonResult = ({
         </div>
         <div className="flex-1">
           <div className="space-y-2">
-            <h3 className="font-medium text-gray-700">SSDM:</h3>
             <div className="bg-gray-50 p-3 rounded space-y-3">
               {matches.length > 0 ? (
                 matches.map((match) => (
@@ -65,11 +62,10 @@ export const ComparisonResult = ({
                           onRowSelect(false);
                         }
                       }}
-                      disabled={isSelected && !selectedMatch}
+                      disabled={isSelected && !selectedMatch && selectedMatch?._id !== match._id}
                     />
                     <div className="flex-1">
                       <p className="break-words">{match.name}</p>
-                      <p className="text-sm text-gray-500 break-words">{match.class}</p>
                     </div>
                   </div>
                 ))

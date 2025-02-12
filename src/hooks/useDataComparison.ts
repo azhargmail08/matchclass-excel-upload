@@ -40,13 +40,35 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
           contact_no: student["Contact No"]?.toString() || undefined,
         }));
 
-        const results = excelData.map(excelEntry => ({
-          excelEntry,
-          matches: findSimilarNames(excelEntry.name, formattedStudents),
-          selectedMatch: undefined
-        }));
+        const results = excelData.map((excelEntry, index) => {
+          const matches = findSimilarNames(excelEntry.name, formattedStudents);
+          // Find the best match (same name and matching class pattern)
+          const bestMatch = matches.find(match => {
+            const excelClass = excelEntry.class.match(/\d+/)?.[0];
+            const matchClass = match.class.match(/\d+/)?.[0];
+            return match.name.toLowerCase() === excelEntry.name.toLowerCase() &&
+                   excelClass && matchClass && 
+                   parseInt(matchClass) === parseInt(excelClass) + 1;
+          });
+
+          return {
+            excelEntry,
+            matches,
+            selectedMatch: bestMatch
+          };
+        });
 
         setComparisonResults(results);
+        
+        // Initialize selected rows with true for matches
+        const initialSelectedRows = results.reduce((acc, result, index) => {
+          if (result.selectedMatch) {
+            acc[index] = true;
+          }
+          return acc;
+        }, {} as {[key: number]: boolean});
+        
+        setSelectedRows(initialSelectedRows);
       } catch (error) {
         console.error('Error comparing data:', error);
         toast({
