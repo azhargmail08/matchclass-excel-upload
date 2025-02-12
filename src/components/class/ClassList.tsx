@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { ClassDetails } from "@/pages/Class";
 import { Button } from "@/components/ui/button";
-import { Download, Upload } from "lucide-react";
+import { Download, Upload, RotateCcw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -73,6 +73,13 @@ export const ClassList = ({
                   </div>
                 </DialogContent>
               </Dialog>
+              <Button 
+                variant="outline" 
+                className="gap-2 hover:bg-gray-50 transition-all duration-200"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Rollback Changes
+              </Button>
             </div>
           </div>
           <CreateClassDialog />
