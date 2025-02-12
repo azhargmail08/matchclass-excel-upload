@@ -47,6 +47,16 @@ export const ComparisonResult = ({
               {matches.length > 0 ? (
                 matches.map((match) => (
                   <div key={match._id} className="flex items-start space-x-2">
+                    <Checkbox
+                      checked={selectedMatch?._id === match._id}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          onMatchSelect(match);
+                        } else {
+                          onMatchSelect(undefined);
+                        }
+                      }}
+                    />
                     <div className="flex-1">
                       <p className="break-words">{match.name}</p>
                       <p className="text-xs text-gray-500">SSDM CLASS: {match.class}</p>
