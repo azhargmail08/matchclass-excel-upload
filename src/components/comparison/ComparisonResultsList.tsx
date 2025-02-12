@@ -2,8 +2,6 @@
 import { ExcelRow, Student } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ComparisonResult } from "./ComparisonResult";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAvailableClasses } from "@/hooks/useAvailableClasses";
 
 interface ComparisonResultsListProps {
   results: Array<{
@@ -22,8 +20,6 @@ export const ComparisonResultsList = ({
   onMatchSelect,
   onRowSelect,
 }: ComparisonResultsListProps) => {
-  const availableClasses = useAvailableClasses();
-
   // Group results by class
   const groupedResults = results.reduce<{
     [key: string]: typeof results;
@@ -39,26 +35,21 @@ export const ComparisonResultsList = ({
   return (
     <ScrollArea className="h-[60vh] sm:h-[70vh]">
       <div className="space-y-8">
+        <div className="grid grid-cols-2 gap-4 px-4 mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Excel Entry</h2>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">SSDM</h2>
+          </div>
+        </div>
         {Object.entries(groupedResults).map(([className, classResults]) => (
           <div key={className} className="space-y-4">
             <div className="grid grid-cols-2 gap-4 px-4">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{className}</h3>
-              </div>
-              <div>
-                <Select defaultValue={className.replace(/(\d+)/, (match) => (parseInt(match) + 1).toString())}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select class" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableClasses.map((cls) => (
-                      <SelectItem key={cls} value={cls}>
-                        {cls}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <h3 className="text-lg font-semibold text-gray-900">{className}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {className.replace(/(\d+)/, (match) => (parseInt(match) + 1).toString())} 
+              </h3>
             </div>
             <div className="space-y-4">
               {classResults.map((result, index) => {
@@ -85,3 +76,4 @@ export const ComparisonResultsList = ({
     </ScrollArea>
   );
 };
+
