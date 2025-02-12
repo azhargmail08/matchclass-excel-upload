@@ -72,51 +72,33 @@ export const updateSelectedRecords = async (
         } else {
           // Create new student with a UUID
           const newStudentId = crypto.randomUUID();
-
-          // Start transaction
-          await supabase.rpc('begin_transaction');
           
-          try {
-            // Insert new student
-            const { error: studentError } = await supabase
-              .from('students')
-              .insert({
-                _id: newStudentId,
-                name: result.excelEntry.name,
-                class: result.excelEntry.class,
-                nickname: result.excelEntry.nickname,
-                special_name: result.excelEntry.special_name,
-                matrix_number: result.excelEntry.matrix_number,
-                date_joined: result.excelEntry.date_joined,
-                father_name: result.excelEntry.father_name,
-                father_id: result.excelEntry.father_id,
-                father_email: result.excelEntry.father_email,
-                mother_name: result.excelEntry.mother_name,
-                mother_id: result.excelEntry.mother_id,
-                mother_email: result.excelEntry.mother_email,
-                contact_no: result.excelEntry.contact_no,
-                teacher: result.excelEntry.teacher
-              });
+          // Create both student and sync record in the same transaction
+          const { data: funcResult, error: insertError } = await supabase.rpc(
+            'create_student_with_sync_record',
+            {
+              p_student_id: newStudentId,
+              p_name: result.excelEntry.name,
+              p_class: result.excelEntry.class,
+              p_nickname: result.excelEntry.nickname || '',
+              p_special_name: result.excelEntry.special_name || '',
+              p_matrix_number: result.excelEntry.matrix_number || '',
+              p_date_joined: result.excelEntry.date_joined || null,
+              p_father_name: result.excelEntry.father_name || '',
+              p_father_id: result.excelEntry.father_id || '',
+              p_father_email: result.excelEntry.father_email || '',
+              p_mother_name: result.excelEntry.mother_name || '',
+              p_mother_id: result.excelEntry.mother_id || '',
+              p_mother_email: result.excelEntry.mother_email || '',
+              p_contact_no: result.excelEntry.contact_no || '',
+              p_teacher: result.excelEntry.teacher || '',
+              p_batch_id: batchData.id
+            }
+          );
 
-            if (studentError) throw studentError;
-
-            // Create sync record
-            const { error: syncError } = await supabase
-              .from('data_sync_records')
-              .insert({
-                batch_id: batchData.id,
-                student_id: newStudentId,
-                status: 'pending'
-              });
-
-            if (syncError) throw syncError;
-
-            // Commit transaction
-            await supabase.rpc('commit_transaction');
-          } catch (transactionError) {
-            // Rollback on any error
-            await supabase.rpc('rollback_transaction');
-            throw transactionError;
+          if (insertError || (funcResult as any)?.status === 'error') {
+            console.error('Error creating student with sync record:', insertError || funcResult);
+            throw new Error(insertError?.message || (funcResult as any)?.message || 'Failed to create student and sync record');
           }
         }
       } catch (recordError) {
