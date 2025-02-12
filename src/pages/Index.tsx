@@ -6,7 +6,6 @@ import { ExcelRow, MatchResult } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { PendingChanges } from "@/components/excel/PendingChanges";
 import { ClassList } from "@/components/excel/ClassList";
 import { useStudentData } from "@/hooks/useStudentData";
 import { useLatestBatch } from "@/hooks/useLatestBatch";
@@ -59,18 +58,9 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="container mx-auto px-4 py-8 flex-grow">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Excel Data Verification
-            </h1>
-            <PendingChanges 
-              latestBatchId={latestBatchId}
-              onRollbackComplete={async () => {
-                await refreshStudents();
-                await refreshLatestBatch();
-              }}
-            />
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+            Excel Data Verification
+          </h1>
           <p className="text-gray-600 mb-8">
             Upload your Excel file to verify and match student data
           </p>
