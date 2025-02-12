@@ -1,13 +1,11 @@
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { findSimilarNames } from "@/utils/nameMatching";
-import { ExcelRow, Student } from "@/types";
+import { ExcelRow } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
-import { ComparisonResult } from "./comparison/ComparisonResult";
+import { ComparisonResultsList } from "./comparison/ComparisonResultsList";
+import { useDataComparison } from "@/hooks/useDataComparison";
+import { updateSelectedRecords } from "@/services/dataUpdateService";
 
 interface DataComparisonProps {
   excelData: ExcelRow[];
@@ -15,177 +13,46 @@ interface DataComparisonProps {
 }
 
 export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonProps) => {
-  const [comparisonResults, setComparisonResults] = useState<Array<{
-    excelEntry: ExcelRow;
-    matches: Array<Student>;
-    selectedMatch?: Student;
-  }>>([]);
-  const [selectedRows, setSelectedRows] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
-  
-  useEffect(() => {
-    const fetchAndCompare = async () => {
-      try {
-        const { data: externalStudents, error } = await supabase
-          .from('external_students')
-          .select('*')
-          .order('name');
-
-        if (error) throw error;
-
-        const results = excelData.map(excelEntry => ({
-          excelEntry,
-          matches: findSimilarNames(excelEntry.name, externalStudents || []),
-          selectedMatch: undefined
-        }));
-
-        setComparisonResults(results);
-      } catch (error) {
-        console.error('Error comparing data:', error);
-        toast({
-          title: "Error",
-          description: "Failed to compare data with database",
-          variant: "destructive",
-        });
-      }
-    };
-
-    if (excelData.length > 0) {
-      fetchAndCompare();
-    }
-  }, [excelData, toast]);
-
-  const handleMatchSelect = (index: number, student: Student | undefined) => {
-    setComparisonResults(prev => prev.map((result, i) => 
-      i === index ? { ...result, selectedMatch: student } : result
-    ));
-  };
-
-  const handleCheckboxChange = (index: number, checked: boolean) => {
-    setSelectedRows(prev => ({
-      ...prev,
-      [index]: checked
-    }));
-  };
+  const {
+    comparisonResults,
+    selectedRows,
+    handleMatchSelect,
+    handleCheckboxChange,
+    setSelectedRows
+  } = useDataComparison(excelData);
 
   const handleUpdate = async () => {
-    try {
-      const selectedIndices = Object.entries(selectedRows)
-        .filter(([_, checked]) => checked)
-        .map(([index]) => parseInt(index));
+    const selectedIndices = Object.entries(selectedRows)
+      .filter(([_, checked]) => checked)
+      .map(([index]) => parseInt(index));
 
-      if (selectedIndices.length === 0) {
-        toast({
-          title: "Warning",
-          description: "Please select at least one row to update",
-          variant: "destructive",
-        });
-        return;
+    if (selectedIndices.length === 0) {
+      toast({
+        title: "Warning",
+        description: "Please select at least one row to update",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedResults = selectedIndices.map(index => comparisonResults[index]);
+    
+    const result = await updateSelectedRecords(selectedResults);
+    
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: "Selected records have been updated",
+      });
+      setSelectedRows({});
+      if (onUpdateComplete) {
+        onUpdateComplete();
       }
-
-      const selectedResults = selectedIndices.map(index => comparisonResults[index]);
-      
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
-        toast({
-          title: "Error",
-          description: "Please login to update data",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Create batch first
-      const { data: batchData, error: batchError } = await supabase
-        .from('data_sync_batches')
-        .insert({
-          user_id: session.session.user.id,
-          status: 'pending'
-        })
-        .select()
-        .single();
-
-      if (batchError) throw batchError;
-
-      try {
-        // Process each result
-        for (const result of selectedResults) {
-          if (result.selectedMatch) {
-            // Update existing student
-            const { error: updateError } = await supabase
-              .from('students')
-              .update({
-                name: result.excelEntry.name,
-                class: result.excelEntry.class,
-              })
-              .eq('_id', result.selectedMatch._id);
-            
-            if (updateError) throw updateError;
-
-            // Create sync record
-            const { error: syncError } = await supabase
-              .from('data_sync_records')
-              .insert({
-                batch_id: batchData.id,
-                student_id: result.selectedMatch._id,
-                external_student_id: result.selectedMatch._id,
-                status: 'pending'
-              });
-
-            if (syncError) throw syncError;
-          } else {
-            // Create new student with a UUID
-            const newStudentId = crypto.randomUUID();
-            
-            // Insert new student
-            const { error: insertError } = await supabase
-              .from('students')
-              .insert({
-                _id: newStudentId,
-                name: result.excelEntry.name,
-                class: result.excelEntry.class,
-              });
-
-            if (insertError) throw insertError;
-
-            // Create sync record
-            const { error: syncError } = await supabase
-              .from('data_sync_records')
-              .insert({
-                batch_id: batchData.id,
-                student_id: newStudentId,
-                external_student_id: null,
-                status: 'pending'
-              });
-
-            if (syncError) throw syncError;
-          }
-        }
-
-        toast({
-          title: "Success",
-          description: "Selected records have been updated",
-        });
-
-        setSelectedRows({});
-        
-        if (onUpdateComplete) {
-          onUpdateComplete();
-        }
-
-      } catch (error) {
-        console.error('Error updating records:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update records",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Error updating records:', error);
+    } else {
       toast({
         title: "Error",
-        description: "Failed to update records",
+        description: result.error?.message || "Failed to update records",
         variant: "destructive",
       });
     }
@@ -198,21 +65,12 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
             Data Comparison Results
           </h2>
-          <ScrollArea className="h-[60vh] sm:h-[70vh]">
-            <div className="space-y-4 sm:space-y-6">
-              {comparisonResults.map((result, index) => (
-                <ComparisonResult
-                  key={index}
-                  excelEntry={result.excelEntry}
-                  matches={result.matches}
-                  selectedMatch={result.selectedMatch}
-                  isSelected={selectedRows[index] || false}
-                  onMatchSelect={(student) => handleMatchSelect(index, student)}
-                  onRowSelect={(checked) => handleCheckboxChange(index, checked)}
-                />
-              ))}
-            </div>
-          </ScrollArea>
+          <ComparisonResultsList
+            results={comparisonResults}
+            selectedRows={selectedRows}
+            onMatchSelect={handleMatchSelect}
+            onRowSelect={handleCheckboxChange}
+          />
         </div>
         <div className="p-4 bg-gray-50 border-t border-gray-200">
           <div className="flex justify-end">
