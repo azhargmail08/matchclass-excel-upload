@@ -23,21 +23,23 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
   } = useDataComparison(excelData);
 
   const handleUpdate = async () => {
-    const selectedResults = comparisonResults
-      .filter((result) => result.selectedMatch !== undefined)
-      .map(result => ({
-        excelRow: result.excelEntry,
-        selectedMatch: result.selectedMatch!
-      }));
+    const selectedIndices = Object.entries(selectedRows)
+      .filter(([_, checked]) => checked)
+      .map(([index]) => parseInt(index));
 
-    if (selectedResults.length === 0) {
+    if (selectedIndices.length === 0) {
       toast({
         title: "Warning",
-        description: "Please select at least one SSDM match to update",
+        description: "Please select at least one record to update",
         variant: "destructive",
       });
       return;
     }
+
+    const selectedResults = selectedIndices.map(index => ({
+      excelRow: comparisonResults[index].excelEntry,
+      selectedMatch: comparisonResults[index].selectedMatch
+    }));
 
     const result = await transferDataToInternal(selectedResults);
       
