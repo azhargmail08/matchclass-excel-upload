@@ -16,12 +16,14 @@ export default function Auth() {
   usePoppinsFont();
 
   useEffect(() => {
+    // Check for existing session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         navigate('/dashboard');
       }
     });
 
+    // Set up auth state listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
