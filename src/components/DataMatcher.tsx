@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { MatchRow } from "./MatchRow";
 import { sortMatchesByFirstName, createInitialSelectedMatches } from "@/utils/matchingUtils";
-import { updateStudentData } from "@/utils/databaseUtils";
+import { transferDataToInternal } from "@/services/dataTransferService";
 
 interface DataMatcherProps {
   matches: MatchResult[];
@@ -49,33 +49,28 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
       return;
     }
 
-    const selectedMatchesToUpdate = selectedIndices.map(index => selectedMatches[index]);
-    const unselectedInSelection = selectedMatchesToUpdate.filter(match => !match.selected);
-    
-    if (unselectedInSelection.length > 0) {
-      toast({
-        title: "Warning",
-        description: "Please select matches for all selected entries",
-        variant: "destructive",
-      });
-      return;
-    }
+    const selectedMatchesToUpdate = selectedIndices.map(index => ({
+      excelRow: selectedMatches[index].excelRow,
+      selectedMatch: selectedMatches[index].selected
+    }));
 
     try {
-      const success = await updateStudentData(selectedMatchesToUpdate);
+      const result = await transferDataToInternal(selectedMatchesToUpdate);
       
-      if (success) {
+      if (result.success) {
         toast({
           title: "Success",
-          description: "Data has been updated successfully",
+          description: "Data has been transferred successfully",
         });
         onConfirm(selectedMatchesToUpdate);
+      } else {
+        throw result.error;
       }
     } catch (error) {
-      console.error('Error updating data:', error);
+      console.error('Error transferring data:', error);
       toast({
         title: "Error",
-        description: "Failed to update data. Please try again.",
+        description: "Failed to transfer data. Please try again.",
         variant: "destructive",
       });
     }
@@ -116,7 +111,7 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
               onClick={handleConfirm}
               className="bg-sage-500 hover:bg-sage-600"
             >
-              Update Selected
+              Transfer Selected
             </Button>
           </div>
         </div>
