@@ -95,23 +95,19 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         return;
       }
 
-      // Start a transaction
-      const { error: beginError } = await supabase.rpc('begin_transaction');
-      if (beginError) throw beginError;
+      // Create batch first
+      const { data: batchData, error: batchError } = await supabase
+        .from('data_sync_batches')
+        .insert({
+          user_id: session.session.user.id,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (batchError) throw batchError;
 
       try {
-        // Create batch
-        const { data: batchData, error: batchError } = await supabase
-          .from('data_sync_batches')
-          .insert({
-            user_id: session.session.user.id,
-            status: 'pending'
-          })
-          .select()
-          .single();
-
-        if (batchError) throw batchError;
-
         // Process each result
         for (const result of selectedResults) {
           if (result.selectedMatch) {
@@ -166,10 +162,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
           }
         }
 
-        // Commit the transaction
-        const { error: commitError } = await supabase.rpc('commit_transaction');
-        if (commitError) throw commitError;
-
         toast({
           title: "Success",
           description: "Selected records have been updated",
@@ -182,14 +174,13 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         }
 
       } catch (error) {
-        // Rollback on any error
-        const { error: rollbackError } = await supabase.rpc('rollback_transaction');
-        if (rollbackError) {
-          console.error('Error rolling back transaction:', rollbackError);
-        }
-        throw error;
+        console.error('Error updating records:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update records",
+          variant: "destructive",
+        });
       }
-
     } catch (error) {
       console.error('Error updating records:', error);
       toast({

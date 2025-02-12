@@ -346,6 +346,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      commit_transaction: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      rollback_transaction: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
