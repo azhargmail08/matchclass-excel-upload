@@ -60,14 +60,8 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
 
         setComparisonResults(results);
         
-        // Initialize selected rows with true for matches
-        const initialSelectedRows = results.reduce((acc, result, index) => {
-          if (result.selectedMatch) {
-            acc[index] = true;
-          }
-          return acc;
-        }, {} as {[key: number]: boolean});
-        
+        // Initialize all rows as unselected
+        const initialSelectedRows = {};
         setSelectedRows(initialSelectedRows);
       } catch (error) {
         console.error('Error comparing data:', error);
