@@ -9,16 +9,17 @@ export const useLatestBatch = () => {
     const { data: session } = await supabase.auth.getSession();
     if (!session.session) return;
 
-    const { data, error } = await supabase
-      .from('student_changes')
-      .select('batch_id')
+    const { data } = await supabase
+      .from('data_sync_batches')
+      .select('id')
       .eq('status', 'pending')
       .eq('user_id', session.session.user.id)
       .order('created_at', { ascending: false })
-      .limit(1);
+      .limit(1)
+      .maybeSingle();
 
-    if (!error && data && data.length > 0) {
-      setLatestBatchId(data[0].batch_id);
+    if (data) {
+      setLatestBatchId(data.id);
     } else {
       setLatestBatchId(null);
     }
