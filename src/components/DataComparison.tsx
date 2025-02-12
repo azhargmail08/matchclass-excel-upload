@@ -1,4 +1,3 @@
-
 import { ExcelRow } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -74,7 +73,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       <Card className="bg-white">
         <div className="p-4 sm:p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Select students to transfer class
+            Select students to transfer class with the correct name from your excel
           </h2>
           <ComparisonResultsList
             results={comparisonResults}
@@ -94,4 +93,3 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
     </div>
   );
 };
-
