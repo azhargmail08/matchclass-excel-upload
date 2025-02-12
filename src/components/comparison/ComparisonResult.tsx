@@ -31,7 +31,7 @@ export const ComparisonResult = ({
             <div className="bg-gray-50 p-3 rounded">
               <div className="flex items-start space-x-2">
                 <Checkbox
-                  checked={isSelected || selectedMatch !== undefined}
+                  checked={isSelected}
                   onCheckedChange={(checked) => onRowSelect(checked as boolean)}
                 />
                 <div className="flex-1">
