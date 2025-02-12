@@ -47,7 +47,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       if (result.success) {
         toast({
           title: "Success",
-          description: `Success, ${selectedResults.length} students transferred`,
+          description: `${selectedResults.length} students transferred`,
         });
         setSelectedRows({});
         if (onUpdateComplete) {
