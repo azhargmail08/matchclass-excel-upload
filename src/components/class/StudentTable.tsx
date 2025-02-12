@@ -98,11 +98,29 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (batchError) throw batchError;
 
+      // Convert student to database format
+      const studentData = {
+        _id: student._id,
+        Name: student.name,
+        Class: student.class,
+        Nickname: student.nickname,
+        "Special Name": student.special_name,
+        "Matrix Number": student.matrix_number,
+        "Date Joined": student.date_joined,
+        Father: student.father_name,
+        "Father ID": student.father_id,
+        "Father Email": student.father_email,
+        Mother: student.mother_name,
+        "Mother ID": student.mother_id,
+        "Mother Email": student.mother_email,
+        "Contact No": student.contact_no
+      };
+
       const { error: deletionError } = await supabase
         .from('student_deletions')
         .insert({
           student_id: student._id,
-          student_data: student,
+          student_data: studentData,
           batch_id: batchData.id,
           user_id: session.session.user.id
         });
@@ -164,9 +182,10 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
       if (deletionsError) throw deletionsError;
 
       for (const deletion of (deletions || [])) {
+        const studentData = deletion.student_data as any;
         const { error: restoreError } = await supabase
           .from('internal_database')
-          .insert(deletion.student_data);
+          .insert(studentData);
 
         if (restoreError) throw restoreError;
 

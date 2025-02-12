@@ -2,6 +2,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ClassList } from "@/components/class/ClassList";
 import { useState, useEffect } from "react";
+import { Student } from "@/types";
 import { ClassDetails } from "@/pages/Class";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -22,7 +23,7 @@ export default function Dashboard() {
 
       // Then fetch all students
       const { data: studentsData, error: studentsError } = await supabase
-        .from('students')
+        .from('internal_database')
         .select('*');
 
       if (studentsError) throw studentsError;
@@ -41,13 +42,23 @@ export default function Dashboard() {
 
       // Add students to their respective classes
       studentsData?.forEach(student => {
-        const classDetails = classMap.get(student.class);
+        const classDetails = classMap.get(student.Class || '');
         if (classDetails) {
           classDetails.students.push({
             _id: student._id,
-            name: student.name,
-            class: student.class,
-            nickname: student.nickname
+            name: student.Name,
+            class: student.Class || '',
+            nickname: student.Nickname,
+            special_name: student["Special Name"],
+            matrix_number: student["Matrix Number"],
+            date_joined: student["Date Joined"],
+            father_name: student.Father,
+            father_id: student["Father ID"]?.toString(),
+            father_email: student["Father Email"],
+            mother_name: student.Mother,
+            mother_id: student["Mother ID"]?.toString(),
+            mother_email: student["Mother Email"],
+            contact_no: student["Contact No"]?.toString()
           });
         }
       });
