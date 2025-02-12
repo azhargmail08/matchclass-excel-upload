@@ -150,6 +150,15 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
         "Contact No": student.contact_no
       };
 
+      // First, delete related class_transfers records
+      const { error: transfersError } = await supabase
+        .from('class_transfers')
+        .delete()
+        .eq('student_id', student._id);
+
+      if (transfersError) throw transfersError;
+
+      // Record deletion in student_deletions
       const { error: deletionError } = await supabase
         .from('student_deletions')
         .insert({
@@ -161,6 +170,7 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (deletionError) throw deletionError;
 
+      // Delete data sync records
       const { error: syncRecordsError } = await supabase
         .from('data_sync_records')
         .delete()
@@ -168,6 +178,7 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (syncRecordsError) throw syncRecordsError;
 
+      // Finally delete the student
       const { error: deleteError } = await supabase
         .from('internal_database')
         .delete()
