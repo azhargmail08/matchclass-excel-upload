@@ -33,13 +33,7 @@ export const ComparisonResult = ({
                 <Checkbox
                   id={`checkbox-${excelEntry.name}-${excelEntry.class}`}
                   checked={isSelected}
-                  onCheckedChange={(checked) => {
-                    onRowSelect(checked as boolean);
-                    // If checking the box and no match is selected yet, select the first match
-                    if (checked && !selectedMatch && matches.length > 0) {
-                      onMatchSelect(matches[0]);
-                    }
-                  }}
+                  onCheckedChange={(checked) => onRowSelect(checked as boolean)}
                 />
                 <div className="flex-1">
                   <p className="break-words">{excelEntry.name}</p>
@@ -57,13 +51,7 @@ export const ComparisonResult = ({
                     <Checkbox
                       id={`match-${match._id}`}
                       checked={selectedMatch?._id === match._id}
-                      onCheckedChange={(checked) => {
-                        onMatchSelect(checked ? match : undefined);
-                        // If selecting a match, also select the row if it's not already selected
-                        if (checked && !isSelected) {
-                          onRowSelect(true);
-                        }
-                      }}
+                      onCheckedChange={(checked) => onMatchSelect(checked ? match : undefined)}
                     />
                     <div className="flex-1">
                       <p className="break-words">{match.name}</p>
@@ -101,3 +89,4 @@ export const ComparisonResult = ({
     </div>
   );
 };
+
