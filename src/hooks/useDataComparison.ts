@@ -18,15 +18,31 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
     const fetchAndCompare = async () => {
       try {
         const { data: externalStudents, error } = await supabase
-          .from('external_students')
-          .select('*')
-          .order('name');
+          .from('external_database')
+          .select('*');
 
         if (error) throw error;
 
+        const formattedStudents = (externalStudents || []).map(student => ({
+          _id: student._id,
+          name: student.Name,
+          class: student.Class,
+          nickname: student.Nickname || undefined,
+          special_name: student["Special Name"] || undefined,
+          matrix_number: student["Matrix Number"]?.toString() || undefined,
+          date_joined: student["Date Joined"] || undefined,
+          father_name: student.Father || undefined,
+          father_id: student["Father ID"] || undefined,
+          father_email: student["Father Email"] || undefined,
+          mother_name: student.Mother || undefined,
+          mother_id: student["Mother ID"]?.toString() || undefined,
+          mother_email: student["Mother Email"] || undefined,
+          contact_no: student["Contact No"]?.toString() || undefined,
+        }));
+
         const results = excelData.map(excelEntry => ({
           excelEntry,
-          matches: findSimilarNames(excelEntry.name, externalStudents || []),
+          matches: findSimilarNames(excelEntry.name, formattedStudents),
           selectedMatch: undefined
         }));
 
