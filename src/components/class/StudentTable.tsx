@@ -60,11 +60,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
   const handleUpdate = async (studentId: string) => {
     try {
       const updatedStudent = editingStudents[studentId];
-      
-      // Convert string values to numbers where needed
-      const fatherId = updatedStudent.father_id ? parseInt(updatedStudent.father_id) : null;
-      const motherId = updatedStudent.mother_id ? parseInt(updatedStudent.mother_id) : null;
-      const contactNo = updatedStudent.contact_no ? parseInt(updatedStudent.contact_no) : null;
 
       const { error } = await supabase
         .from('internal_database')
@@ -76,12 +71,12 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
           "Matrix Number": updatedStudent.matrix_number,
           "Date Joined": updatedStudent.date_joined,
           Father: updatedStudent.father_name,
-          "Father ID": fatherId,
+          "Father ID": updatedStudent.father_id,
           "Father Email": updatedStudent.father_email,
           Mother: updatedStudent.mother_name,
-          "Mother ID": motherId,
+          "Mother ID": updatedStudent.mother_id,
           "Mother Email": updatedStudent.mother_email,
-          "Contact No": contactNo
+          "Contact No": updatedStudent.contact_no
         })
         .eq('_id', studentId);
 
@@ -132,7 +127,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (batchError) throw batchError;
 
-      // Convert student to database format
       const studentData = {
         _id: student._id,
         Name: student.name,
@@ -150,7 +144,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
         "Contact No": student.contact_no
       };
 
-      // First, delete related class_transfers records
       const { error: transfersError } = await supabase
         .from('class_transfers')
         .delete()
@@ -158,7 +151,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (transfersError) throw transfersError;
 
-      // Record deletion in student_deletions
       const { error: deletionError } = await supabase
         .from('student_deletions')
         .insert({
@@ -170,7 +162,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (deletionError) throw deletionError;
 
-      // Delete data sync records
       const { error: syncRecordsError } = await supabase
         .from('data_sync_records')
         .delete()
@@ -178,7 +169,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (syncRecordsError) throw syncRecordsError;
 
-      // Finally delete the student
       const { error: deleteError } = await supabase
         .from('internal_database')
         .delete()

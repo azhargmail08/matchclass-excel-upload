@@ -36,11 +36,6 @@ export const updateSelectedRecords = async (
     for (const result of selectedResults) {
       try {
         if (result.selectedMatch) {
-          // Convert string IDs to numbers where needed
-          const fatherId = result.excelEntry.father_id ? parseInt(result.excelEntry.father_id) : null;
-          const motherId = result.excelEntry.mother_id ? parseInt(result.excelEntry.mother_id) : null;
-          const contactNo = result.excelEntry.contact_no ? parseInt(result.excelEntry.contact_no) : null;
-
           // Update existing student
           const { error: updateError } = await supabase
             .from('internal_database')
@@ -52,12 +47,12 @@ export const updateSelectedRecords = async (
               "Matrix Number": result.excelEntry.matrix_number,
               "Date Joined": result.excelEntry.date_joined,
               Father: result.excelEntry.father_name,
-              "Father ID": fatherId,
+              "Father ID": result.excelEntry.father_id,
               "Father Email": result.excelEntry.father_email,
               Mother: result.excelEntry.mother_name,
-              "Mother ID": motherId,
+              "Mother ID": result.excelEntry.mother_id,
               "Mother Email": result.excelEntry.mother_email,
-              "Contact No": contactNo
+              "Contact No": result.excelEntry.contact_no
             })
             .eq('_id', result.selectedMatch._id);
           
@@ -76,11 +71,6 @@ export const updateSelectedRecords = async (
         } else {
           // Create new student with a UUID
           const newStudentId = crypto.randomUUID();
-          
-          // Convert string IDs to numbers where needed
-          const fatherId = result.excelEntry.father_id ? parseInt(result.excelEntry.father_id) : null;
-          const motherId = result.excelEntry.mother_id ? parseInt(result.excelEntry.mother_id) : null;
-          const contactNo = result.excelEntry.contact_no ? parseInt(result.excelEntry.contact_no) : null;
 
           const { error: insertError } = await supabase
             .from('internal_database')
@@ -93,12 +83,12 @@ export const updateSelectedRecords = async (
               "Matrix Number": result.excelEntry.matrix_number,
               "Date Joined": result.excelEntry.date_joined,
               Father: result.excelEntry.father_name,
-              "Father ID": fatherId,
+              "Father ID": result.excelEntry.father_id,
               "Father Email": result.excelEntry.father_email,
               Mother: result.excelEntry.mother_name,
-              "Mother ID": motherId,
+              "Mother ID": result.excelEntry.mother_id,
               "Mother Email": result.excelEntry.mother_email,
-              "Contact No": contactNo
+              "Contact No": result.excelEntry.contact_no
             });
 
           if (insertError) throw insertError;
