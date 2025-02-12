@@ -34,68 +34,70 @@ export const updateSelectedRecords = async (
 
     // Process each result
     for (const result of selectedResults) {
-      if (result.selectedMatch) {
-        // Update existing student
-        const { error: updateError } = await supabase
-          .from('students')
-          .update({
-            name: result.excelEntry.name,
-            class: result.excelEntry.class,
-          })
-          .eq('_id', result.selectedMatch._id);
-        
-        if (updateError) throw updateError;
+      try {
+        if (result.selectedMatch) {
+          // Update existing student
+          const { error: updateError } = await supabase
+            .from('students')
+            .update({
+              name: result.excelEntry.name,
+              class: result.excelEntry.class,
+            })
+            .eq('_id', result.selectedMatch._id);
+          
+          if (updateError) throw updateError;
 
-        // Create sync record for existing student
-        const { error: syncError } = await supabase
-          .from('data_sync_records')
-          .insert({
-            batch_id: batchData.id,
-            student_id: result.selectedMatch._id,
-            external_student_id: result.selectedMatch._id,
-            status: 'pending'
-          });
+          // Create sync record for existing student
+          const { error: syncError } = await supabase
+            .from('data_sync_records')
+            .insert({
+              batch_id: batchData.id,
+              student_id: result.selectedMatch._id,
+              status: 'pending'
+            });
 
-        if (syncError) throw syncError;
-      } else {
-        // Create new student with a UUID
-        const newStudentId = crypto.randomUUID();
-        
-        // Insert new student and verify insertion
-        const { data: newStudent, error: insertError } = await supabase
-          .from('students')
-          .insert({
-            _id: newStudentId,
-            name: result.excelEntry.name,
-            class: result.excelEntry.class,
-          })
-          .select()
-          .single();
+          if (syncError) throw syncError;
+        } else {
+          // Create new student with a UUID
+          const newStudentId = crypto.randomUUID();
+          
+          // Insert new student
+          const { data: newStudent, error: insertError } = await supabase
+            .from('students')
+            .insert({
+              _id: newStudentId,
+              name: result.excelEntry.name,
+              class: result.excelEntry.class,
+            })
+            .select()
+            .single();
 
-        if (insertError) throw insertError;
-        if (!newStudent) throw new Error('Failed to create new student');
+          if (insertError) {
+            console.error('Error inserting new student:', insertError);
+            throw insertError;
+          }
 
-        // Verify student exists before creating sync record
-        const { data: studentCheck, error: checkError } = await supabase
-          .from('students')
-          .select('_id')
-          .eq('_id', newStudentId)
-          .single();
+          if (!newStudent) {
+            throw new Error('Failed to create new student');
+          }
 
-        if (checkError) throw checkError;
-        if (!studentCheck) throw new Error('Failed to verify student creation');
+          // Create sync record for new student
+          const { error: syncError } = await supabase
+            .from('data_sync_records')
+            .insert({
+              batch_id: batchData.id,
+              student_id: newStudentId,
+              status: 'pending'
+            });
 
-        // Create sync record for new student
-        const { error: syncError } = await supabase
-          .from('data_sync_records')
-          .insert({
-            batch_id: batchData.id,
-            student_id: newStudentId,
-            external_student_id: null,
-            status: 'pending'
-          });
-
-        if (syncError) throw syncError;
+          if (syncError) {
+            console.error('Error creating sync record:', syncError);
+            throw syncError;
+          }
+        }
+      } catch (recordError) {
+        console.error('Error processing record:', recordError);
+        throw recordError;
       }
     }
 
