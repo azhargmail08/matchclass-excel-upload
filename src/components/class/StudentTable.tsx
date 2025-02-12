@@ -45,8 +45,22 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
     try {
       const updatedStudent = editingStudents[studentId];
       const { error } = await supabase
-        .from('students')
-        .update(updatedStudent)
+        .from('internal_database')
+        .update({
+          Name: updatedStudent.name,
+          Class: updatedStudent.class,
+          Nickname: updatedStudent.nickname,
+          "Special Name": updatedStudent.special_name,
+          "Matrix Number": updatedStudent.matrix_number,
+          "Date Joined": updatedStudent.date_joined,
+          Father: updatedStudent.father_name,
+          "Father ID": updatedStudent.father_id,
+          "Father Email": updatedStudent.father_email,
+          Mother: updatedStudent.mother_name,
+          "Mother ID": updatedStudent.mother_id,
+          "Mother Email": updatedStudent.mother_email,
+          "Contact No": updatedStudent.contact_no
+        })
         .eq('_id', studentId);
 
       if (error) throw error;
@@ -117,9 +131,9 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (syncRecordsError) throw syncRecordsError;
 
-      // Then delete from students table
+      // Then delete from internal_database table
       const { error: deleteError } = await supabase
-        .from('students')
+        .from('internal_database')
         .delete()
         .eq('_id', student._id);
 

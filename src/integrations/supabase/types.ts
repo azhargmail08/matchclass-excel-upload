@@ -9,6 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      classes: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          teacher: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          teacher?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          teacher?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      data_sync_batches: {
+        Row: {
+          created_at: string | null
+          id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_sync_records: {
+        Row: {
+          batch_id: string
+          created_at: string | null
+          id: string
+          status: string | null
+          student_id: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          student_id: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_sync_records_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "data_sync_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       external_database: {
         Row: {
           _id: string
@@ -110,6 +187,89 @@ export type Database = {
           "Special Name"?: string | null
         }
         Relationships: []
+      }
+      student_changes: {
+        Row: {
+          batch_id: string
+          created_at: string | null
+          id: string
+          new_class: string
+          new_name: string
+          new_nickname: string | null
+          old_class: string
+          old_name: string
+          old_nickname: string | null
+          status: string | null
+          student_id: string
+          user_id: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string | null
+          id?: string
+          new_class: string
+          new_name: string
+          new_nickname?: string | null
+          old_class: string
+          old_name: string
+          old_nickname?: string | null
+          status?: string | null
+          student_id: string
+          user_id: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string | null
+          id?: string
+          new_class?: string
+          new_name?: string
+          new_nickname?: string | null
+          old_class?: string
+          old_name?: string
+          old_nickname?: string | null
+          status?: string | null
+          student_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_deletions: {
+        Row: {
+          batch_id: string
+          created_at: string | null
+          id: string
+          status: string | null
+          student_data: Json
+          student_id: string
+          user_id: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          student_data: Json
+          student_id: string
+          user_id: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          student_data?: Json
+          student_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_deletions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "data_sync_batches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

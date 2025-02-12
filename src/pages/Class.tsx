@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,16 +39,33 @@ const Class = () => {
 
       // Then fetch students for this class
       const { data: studentsData, error: studentsError } = await supabase
-        .from('students')
+        .from('internal_database')
         .select('*')
-        .eq('class', className);
+        .eq('Class', className);
 
       if (studentsError) throw studentsError;
+
+      const formattedStudents = (studentsData || []).map(student => ({
+        _id: student._id,
+        name: student.Name,
+        class: student.Class || '',
+        nickname: student.Nickname || undefined,
+        special_name: student["Special Name"] || undefined,
+        matrix_number: student["Matrix Number"] || undefined,
+        date_joined: student["Date Joined"] || undefined,
+        father_name: student.Father || undefined,
+        father_id: student["Father ID"]?.toString() || undefined,
+        father_email: student["Father Email"] || undefined,
+        mother_name: student.Mother || undefined,
+        mother_id: student["Mother ID"]?.toString() || undefined,
+        mother_email: student["Mother Email"] || undefined,
+        contact_no: student["Contact No"]?.toString() || undefined,
+      }));
 
       setSelectedClass({
         className: className || '',
         teacher: classData?.teacher || 'Unassigned',
-        students: studentsData || []
+        students: formattedStudents
       });
     } catch (error) {
       console.error('Error fetching class details:', error);
