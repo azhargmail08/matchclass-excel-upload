@@ -169,7 +169,25 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       // Restore deleted students
       for (const deletion of (deletions || [])) {
-        const studentData = deletion.student_data as Student;
+        // Properly type cast the student data
+        const studentData = deletion.student_data as unknown as { 
+          _id: string;
+          name: string;
+          class: string;
+          nickname?: string;
+          special_name?: string;
+          matrix_number?: string;
+          date_joined?: string;
+          father_name?: string;
+          father_id?: string;
+          father_email?: string;
+          mother_name?: string;
+          mother_id?: string;
+          mother_email?: string;
+          contact_no?: string;
+          teacher?: string;
+        };
+
         const { error: restoreError } = await supabase
           .from('students')
           .insert(studentData);
