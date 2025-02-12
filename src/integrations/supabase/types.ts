@@ -350,6 +350,27 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      create_student_with_sync_record: {
+        Args: {
+          p_student_id: string
+          p_name: string
+          p_class: string
+          p_nickname: string
+          p_special_name: string
+          p_matrix_number: string
+          p_date_joined: string
+          p_father_name: string
+          p_father_id: string
+          p_father_email: string
+          p_mother_name: string
+          p_mother_id: string
+          p_mother_email: string
+          p_contact_no: string
+          p_teacher: string
+          p_batch_id: string
+        }
+        Returns: Json
+      }
       rollback_transaction: {
         Args: Record<PropertyKey, never>
         Returns: undefined
