@@ -28,8 +28,16 @@ export const ComparisonResult = ({
             <div className="bg-gray-50 p-3 rounded">
               <div className="flex items-start space-x-2">
                 <Checkbox
-                  checked={isSelected}
-                  onCheckedChange={(checked) => onRowSelect(checked as boolean)}
+                  checked={isSelected && !selectedMatch}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      onMatchSelect(undefined);
+                      onRowSelect(true);
+                    } else {
+                      onRowSelect(false);
+                    }
+                  }}
+                  disabled={Boolean(selectedMatch)}
                 />
                 <div className="flex-1">
                   <p className="break-words">{excelEntry.name}</p>
@@ -51,10 +59,13 @@ export const ComparisonResult = ({
                       onCheckedChange={(checked) => {
                         if (checked) {
                           onMatchSelect(match);
+                          onRowSelect(true);
                         } else {
                           onMatchSelect(undefined);
+                          onRowSelect(false);
                         }
                       }}
+                      disabled={isSelected && !selectedMatch}
                     />
                     <div className="flex-1">
                       <p className="break-words">{match.name}</p>

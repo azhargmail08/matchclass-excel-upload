@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { findSimilarNames } from "@/utils/nameMatching";
@@ -84,17 +83,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       }
 
       const selectedResults = selectedIndices.map(index => comparisonResults[index]);
-      const unselectedMatches = selectedResults.filter(result => !result.selectedMatch);
       
-      if (unselectedMatches.length > 0) {
-        toast({
-          title: "Warning",
-          description: "Please select matches for all selected rows",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) {
         toast({
@@ -103,30 +92,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
           variant: "destructive",
         });
         return;
-      }
-
-      // First, ensure the external students exist in the external_students table
-      for (const result of selectedResults) {
-        if (!result.selectedMatch) continue;
-
-        const { data: existingExternalStudent } = await supabase
-          .from('external_students')
-          .select('_id')
-          .eq('_id', result.selectedMatch._id)
-          .single();
-
-        if (!existingExternalStudent) {
-          // Insert into external_students if not exists
-          const { error: insertError } = await supabase
-            .from('external_students')
-            .insert({
-              _id: result.selectedMatch._id,
-              name: result.selectedMatch.name,
-              class: result.selectedMatch.class
-            });
-
-          if (insertError) throw insertError;
-        }
       }
 
       const { data: batchData, error: batchError } = await supabase
@@ -140,29 +105,33 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
 
       if (batchError) throw batchError;
 
-      const syncRecords = selectedResults.map(result => ({
-        batch_id: batchData.id,
-        student_id: result.selectedMatch!._id,
-        external_student_id: result.selectedMatch!._id,
-        status: 'pending'
-      }));
-
-      const { error: syncError } = await supabase
-        .from('data_sync_records')
-        .insert(syncRecords);
-
-      if (syncError) throw syncError;
-
       for (const result of selectedResults) {
-        const { error: updateError } = await supabase
-          .from('students')
-          .update({
-            name: result.excelEntry.name,
-            class: result.excelEntry.class
-          })
-          .eq('_id', result.selectedMatch!._id);
+        const updateData = result.selectedMatch ? {
+          class: result.selectedMatch.class
+        } : {
+          name: result.excelEntry.name,
+          class: result.excelEntry.class
+        };
 
+        const query = result.selectedMatch 
+          ? supabase.from('students').update(updateData).eq('_id', result.selectedMatch._id)
+          : supabase.from('students').update(updateData).eq('name', result.excelEntry.name);
+
+        const { error: updateError } = await query;
         if (updateError) throw updateError;
+
+        const syncRecord = {
+          batch_id: batchData.id,
+          student_id: result.selectedMatch?._id || null,
+          external_student_id: result.selectedMatch?._id || null,
+          status: 'pending'
+        };
+
+        const { error: syncError } = await supabase
+          .from('data_sync_records')
+          .insert(syncRecord);
+
+        if (syncError) throw syncError;
       }
 
       toast({
