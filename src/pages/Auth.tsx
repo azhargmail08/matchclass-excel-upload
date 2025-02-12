@@ -1,16 +1,37 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignupForm } from "@/components/auth/SignupForm";
 import { MobileAppSection } from "@/components/auth/MobileAppSection";
 import { usePoppinsFont } from "@/hooks/usePoppinsFont";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Auth() {
   const [showSignup, setShowSignup] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const navigate = useNavigate();
 
   usePoppinsFont();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard');
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        navigate('/dashboard');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 font-sans">
