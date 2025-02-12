@@ -9,7 +9,108 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      external_database: {
+        Row: {
+          _id: string
+          Class: string
+          "Contact No": number | null
+          "Date Joined": string | null
+          Father: string | null
+          "Father Email": string | null
+          "Father ID": string | null
+          "Matrix Number": number | null
+          Mother: string | null
+          "Mother Email": string | null
+          "Mother ID": number | null
+          Name: string
+          Nickname: string | null
+          "Special Name": string | null
+        }
+        Insert: {
+          _id: string
+          Class: string
+          "Contact No"?: number | null
+          "Date Joined"?: string | null
+          Father?: string | null
+          "Father Email"?: string | null
+          "Father ID"?: string | null
+          "Matrix Number"?: number | null
+          Mother?: string | null
+          "Mother Email"?: string | null
+          "Mother ID"?: number | null
+          Name: string
+          Nickname?: string | null
+          "Special Name"?: string | null
+        }
+        Update: {
+          _id?: string
+          Class?: string
+          "Contact No"?: number | null
+          "Date Joined"?: string | null
+          Father?: string | null
+          "Father Email"?: string | null
+          "Father ID"?: string | null
+          "Matrix Number"?: number | null
+          Mother?: string | null
+          "Mother Email"?: string | null
+          "Mother ID"?: number | null
+          Name?: string
+          Nickname?: string | null
+          "Special Name"?: string | null
+        }
+        Relationships: []
+      }
+      internal_database: {
+        Row: {
+          _id: string
+          Class: string | null
+          "Contact No": number | null
+          "Date Joined": string | null
+          Father: string | null
+          "Father Email": string | null
+          "Father ID": number | null
+          "Matrix Number": string | null
+          Mother: string | null
+          "Mother Email": string | null
+          "Mother ID": number | null
+          Name: string
+          Nickname: string | null
+          "Special Name": string | null
+        }
+        Insert: {
+          _id: string
+          Class?: string | null
+          "Contact No"?: number | null
+          "Date Joined"?: string | null
+          Father?: string | null
+          "Father Email"?: string | null
+          "Father ID"?: number | null
+          "Matrix Number"?: string | null
+          Mother?: string | null
+          "Mother Email"?: string | null
+          "Mother ID"?: number | null
+          Name: string
+          Nickname?: string | null
+          "Special Name"?: string | null
+        }
+        Update: {
+          _id?: string
+          Class?: string | null
+          "Contact No"?: number | null
+          "Date Joined"?: string | null
+          Father?: string | null
+          "Father Email"?: string | null
+          "Father ID"?: number | null
+          "Matrix Number"?: string | null
+          Mother?: string | null
+          "Mother Email"?: string | null
+          "Mother ID"?: number | null
+          Name?: string
+          Nickname?: string | null
+          "Special Name"?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
