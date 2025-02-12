@@ -42,7 +42,8 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       .map(result => result.selectedMatch!);
 
     if (studentsToTransfer.length > 0) {
-      const result = await transferDataToInternal(studentsToTransfer);
+      // Pass both the students to transfer and the Excel data
+      const result = await transferDataToInternal(studentsToTransfer, excelData);
       
       if (result.success) {
         toast({
