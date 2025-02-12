@@ -21,8 +21,8 @@ export const ComparisonResult = ({
 }: ComparisonResultProps) => {
   return (
     <div className="border-b border-gray-200 pb-4">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 space-y-4 sm:space-y-0">
-        <div className="flex-1">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
           <div className="space-y-2">
             <div className="bg-gray-50 p-3 rounded">
               <div className="flex items-start space-x-2">
@@ -45,7 +45,7 @@ export const ComparisonResult = ({
             </div>
           </div>
         </div>
-        <div className="flex-1">
+        <div>
           <div className="space-y-2">
             <div className="bg-gray-50 p-3 rounded space-y-3">
               {matches.length > 0 ? (

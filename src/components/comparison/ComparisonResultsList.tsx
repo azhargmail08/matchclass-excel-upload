@@ -35,9 +35,22 @@ export const ComparisonResultsList = ({
   return (
     <ScrollArea className="h-[60vh] sm:h-[70vh]">
       <div className="space-y-8">
+        <div className="grid grid-cols-2 gap-4 px-4 mb-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Excel Entry</h2>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">SSDM</h2>
+          </div>
+        </div>
         {Object.entries(groupedResults).map(([className, classResults]) => (
           <div key={className} className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 px-4">{className}</h3>
+            <div className="grid grid-cols-2 gap-4 px-4">
+              <h3 className="text-lg font-semibold text-gray-900">{className}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {className.replace(/(\d+)/, (match) => (parseInt(match) + 1).toString())} 
+              </h3>
+            </div>
             <div className="space-y-4">
               {classResults.map((result, index) => {
                 const globalIndex = results.findIndex(r => 
