@@ -11,7 +11,7 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
     matches: Array<Student>;
     selectedMatch?: Student;
   }>>([]);
-  const [selectedRows, setSelectedRows] = useState<{[key: number]: boolean}>({});
+  const [selectedRows, setSelectedRows] = useState<{[key: string]: boolean}>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
 
         setComparisonResults(results);
         
-        // Initialize all rows as unselected
+        // Initialize all rows as unselected with a unique key for each row
         const initialSelectedRows = {};
         setSelectedRows(initialSelectedRows);
       } catch (error) {
@@ -85,9 +85,13 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
   };
 
   const handleCheckboxChange = (index: number, checked: boolean) => {
+    // Create a unique key using both the index and the entry details
+    const entry = comparisonResults[index];
+    const key = `${entry.excelEntry.name}-${entry.excelEntry.class}-${index}`;
+    
     setSelectedRows(prev => ({
       ...prev,
-      [index]: checked
+      [key]: checked
     }));
   };
 

@@ -23,11 +23,18 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
   } = useDataComparison(excelData);
 
   const handleUpdate = async () => {
-    const selectedIndices = Object.entries(selectedRows)
-      .filter(([_, checked]) => checked)
-      .map(([index]) => parseInt(index));
+    // Filter selected results based on the unique keys in selectedRows
+    const selectedResults = comparisonResults
+      .filter((result, index) => {
+        const key = `${result.excelEntry.name}-${result.excelEntry.class}-${index}`;
+        return selectedRows[key];
+      })
+      .map(result => ({
+        excelRow: result.excelEntry,
+        selectedMatch: result.selectedMatch
+      }));
 
-    if (selectedIndices.length === 0) {
+    if (selectedResults.length === 0) {
       toast({
         title: "Warning",
         description: "Please select at least one record to update",
@@ -35,11 +42,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       });
       return;
     }
-
-    const selectedResults = selectedIndices.map(index => ({
-      excelRow: comparisonResults[index].excelEntry,
-      selectedMatch: comparisonResults[index].selectedMatch
-    }));
 
     const result = await transferDataToInternal(selectedResults);
       

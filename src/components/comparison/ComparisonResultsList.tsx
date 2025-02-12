@@ -10,7 +10,7 @@ interface ComparisonResultsListProps {
     matches: Array<Student>;
     selectedMatch?: Student;
   }>;
-  selectedRows: {[key: number]: boolean};
+  selectedRows: {[key: string]: boolean};
   onMatchSelect: (index: number, student: Student | undefined) => void;
   onRowSelect: (index: number, checked: boolean) => void;
 }
@@ -35,6 +35,11 @@ export const ComparisonResultsList = ({
 
   // Separate unmatched entries (those with no matches)
   const unmatchedEntries = results.filter(result => result.matches.length === 0);
+
+  const getIsSelected = (result: typeof results[0], index: number) => {
+    const key = `${result.excelEntry.name}-${result.excelEntry.class}-${index}`;
+    return selectedRows[key] || false;
+  };
 
   return (
     <ScrollArea className="h-[60vh] sm:h-[70vh]">
@@ -70,11 +75,11 @@ export const ComparisonResultsList = ({
                     );
                     return (
                       <ComparisonResult
-                        key={globalIndex}
+                        key={`${result.excelEntry.name}-${result.excelEntry.class}-${globalIndex}`}
                         excelEntry={result.excelEntry}
                         matches={result.matches}
                         selectedMatch={result.selectedMatch}
-                        isSelected={selectedRows[globalIndex] || false}
+                        isSelected={getIsSelected(result, globalIndex)}
                         onMatchSelect={(student) => onMatchSelect(globalIndex, student)}
                         onRowSelect={(checked) => onRowSelect(globalIndex, checked)}
                       />
