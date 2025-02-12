@@ -22,7 +22,7 @@ export const ComparisonResult = ({
 }: ComparisonResultProps) => {
   return (
     <div className="border-b border-gray-200 pb-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-[1fr,auto,1fr] gap-4 items-center">
         <div>
           <div className="space-y-2">
             <div className="bg-gray-50 p-3 rounded">
@@ -42,10 +42,12 @@ export const ComparisonResult = ({
                 <div className="flex-1">
                   <p className="break-words">{excelEntry.name}</p>
                 </div>
-                <ArrowRight className="text-gray-400 mt-1" />
               </div>
             </div>
           </div>
+        </div>
+        <div className="flex items-center justify-center">
+          <ArrowRight className="text-gray-400" />
         </div>
         <div>
           <div className="space-y-2">
@@ -81,4 +83,3 @@ export const ComparisonResult = ({
     </div>
   );
 };
-
