@@ -36,14 +36,13 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       return;
     }
 
-    const selectedResults = selectedIndices.map(index => comparisonResults[index]);
-    const studentsToTransfer = selectedResults
-      .filter(result => result.selectedMatch)
-      .map(result => result.selectedMatch!);
+    const selectedResults = selectedIndices.map(index => ({
+      excelRow: comparisonResults[index].excelEntry,
+      selectedMatch: comparisonResults[index].selectedMatch
+    }));
 
-    if (studentsToTransfer.length > 0) {
-      // Pass both the students to transfer and the Excel data
-      const result = await transferDataToInternal(studentsToTransfer, excelData);
+    if (selectedResults.length > 0) {
+      const result = await transferDataToInternal(selectedResults);
       
       if (result.success) {
         toast({
