@@ -28,10 +28,10 @@ export const updateStudentData = async (selectedMatches: MatchResult[]) => {
 
   for (const match of selectedMatches) {
     const { error: updateError } = await supabase
-      .from('students')
+      .from('internal_database')
       .update({
-        name: match.excelRow.name,
-        class: match.excelRow.class,
+        Name: match.excelRow.name,
+        Class: match.excelRow.class,
       })
       .eq('_id', match.selected!._id);
 

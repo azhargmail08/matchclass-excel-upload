@@ -43,11 +43,11 @@ export const PendingChanges = ({ latestBatchId, onRollbackComplete }: PendingCha
 
       for (const change of changes) {
         const { error: updateError } = await supabase
-          .from('students')
+          .from('internal_database')
           .update({
-            name: change.old_name,
-            class: change.old_class,
-            nickname: change.old_nickname,
+            Name: change.old_name,
+            Class: change.old_class,
+            Nickname: change.old_nickname,
           })
           .eq('_id', change.student_id);
 

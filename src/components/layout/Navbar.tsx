@@ -12,27 +12,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+interface UserProfile {
+  full_name: string | null;
+  avatar_url: string | null;
+}
+
 export const Navbar = () => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState<{
-    full_name: string | null;
-    avatar_url: string | null;
-  } | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name, avatar_url')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile) {
-          setUserProfile(profile);
-        }
+        // We're using the auth metadata for the profile since there's no profiles table
+        setUserProfile({
+          full_name: user.user_metadata.full_name || user.email,
+          avatar_url: user.user_metadata.avatar_url || null
+        });
       }
     };
 
