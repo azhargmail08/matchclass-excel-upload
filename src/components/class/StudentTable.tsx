@@ -101,7 +101,7 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
         .from('student_deletions')
         .insert({
           student_id: student._id,
-          student_data: student,
+          student_data: student as unknown as Json,
           batch_id: batchData.id,
           user_id: session.session.user.id
         });
@@ -160,9 +160,10 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       // Restore deleted students
       for (const deletion of (deletions || [])) {
+        const studentData = deletion.student_data as Student;
         const { error: restoreError } = await supabase
           .from('students')
-          .insert(deletion.student_data);
+          .insert(studentData);
 
         if (restoreError) throw restoreError;
 
