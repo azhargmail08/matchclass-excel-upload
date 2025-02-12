@@ -90,10 +90,14 @@ export const ColumnMapping = ({
           value={getSelectValue(field as keyof ColumnMappingType)}
           onValueChange={(value) => handleValueChange(field as keyof ColumnMappingType, value)}
         >
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={`Select ${field.replace(/_/g, ' ')} column`} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent
+            position="popper"
+            className="w-[var(--radix-select-trigger-width)] max-h-[300px] overflow-y-auto bg-white"
+            align="start"
+          >
             <SelectItem value={NONE_VALUE}>None</SelectItem>
             {availableColumns.map((column) => (
               <SelectItem key={column} value={column}>
