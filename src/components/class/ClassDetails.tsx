@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { ClassDetails as ClassDetailsType } from "@/pages/Class";
 import { Button } from "@/components/ui/button";
@@ -94,7 +93,7 @@ export const ClassDetailsView = ({ classDetails, onRefresh }: ClassDetailsProps)
           </Card>
         </div>
 
-        <StudentTable students={classDetails.students} />
+        <StudentTable students={classDetails.students} onRefresh={onRefresh} />
       </div>
     </div>
   );

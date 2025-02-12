@@ -1,19 +1,32 @@
+
 import { Student } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Eye, Info } from "lucide-react";
+import { Eye, Info, Trash2, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface StudentTableProps {
   students: Student[];
+  onRefresh?: () => void;
 }
 
-export const StudentTable = ({ students }: StudentTableProps) => {
+export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStudents, setEditingStudents] = useState<{ [key: string]: Student }>({});
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const { toast } = useToast();
   const isMobile = useIsMobile();
 
@@ -47,11 +60,136 @@ export const StudentTable = ({ students }: StudentTableProps) => {
         delete newState[studentId];
         return newState;
       });
+
+      if (onRefresh) onRefresh();
     } catch (error) {
       console.error('Error updating student:', error);
       toast({
         title: "Error",
         description: "Failed to update student information",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDelete = async (student: Student) => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        toast({
+          title: "Error",
+          description: "Please login to delete students",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create a new batch
+      const { data: batchData, error: batchError } = await supabase
+        .from('data_sync_batches')
+        .insert({
+          user_id: session.session.user.id,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (batchError) throw batchError;
+
+      // Store the student data before deletion
+      const { error: deletionError } = await supabase
+        .from('student_deletions')
+        .insert({
+          student_id: student._id,
+          student_data: student,
+          batch_id: batchData.id,
+          user_id: session.session.user.id
+        });
+
+      if (deletionError) throw deletionError;
+
+      // Delete from students table
+      const { error: deleteError } = await supabase
+        .from('students')
+        .delete()
+        .eq('_id', student._id);
+
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Success",
+        description: "Student deleted successfully",
+      });
+
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      console.error('Error deleting student:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete student",
+        variant: "destructive",
+      });
+    }
+    setStudentToDelete(null);
+  };
+
+  const handleRollback = async () => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) return;
+
+      // Get the latest batch for this user
+      const { data: latestBatch, error: batchError } = await supabase
+        .from('data_sync_batches')
+        .select('id')
+        .eq('user_id', session.session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (batchError) throw batchError;
+
+      // Get deleted students from this batch
+      const { data: deletions, error: deletionsError } = await supabase
+        .from('student_deletions')
+        .select('*')
+        .eq('batch_id', latestBatch.id)
+        .eq('status', 'pending');
+
+      if (deletionsError) throw deletionsError;
+
+      // Restore deleted students
+      for (const deletion of (deletions || [])) {
+        const { error: restoreError } = await supabase
+          .from('students')
+          .insert(deletion.student_data);
+
+        if (restoreError) throw restoreError;
+
+        // Update deletion status
+        await supabase
+          .from('student_deletions')
+          .update({ status: 'rolled_back' })
+          .eq('id', deletion.id);
+      }
+
+      // Update batch status
+      await supabase
+        .from('data_sync_batches')
+        .update({ status: 'rolled_back' })
+        .eq('id', latestBatch.id);
+
+      toast({
+        title: "Success",
+        description: "Changes have been rolled back successfully",
+      });
+
+      if (onRefresh) onRefresh();
+    } catch (error) {
+      console.error('Error rolling back changes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to roll back changes",
         variant: "destructive",
       });
     }
@@ -66,10 +204,20 @@ export const StudentTable = ({ students }: StudentTableProps) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <select className="border rounded-lg px-4 py-2 w-full sm:w-auto">
-          <option>Sort A-Z</option>
-          <option>Sort Z-A</option>
-        </select>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleRollback}
+            className="flex items-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Rollback Changes
+          </Button>
+          <select className="border rounded-lg px-4 py-2 w-full sm:w-auto">
+            <option>Sort A-Z</option>
+            <option>Sort Z-A</option>
+          </select>
+        </div>
       </div>
 
       <div className="relative rounded-lg shadow border bg-white flex flex-col">
@@ -183,6 +331,14 @@ export const StudentTable = ({ students }: StudentTableProps) => {
                               Update
                             </Button>
                           )}
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setStudentToDelete(student)}
+                            className="h-8 w-8 text-red-500 hover:text-red-600"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -195,6 +351,26 @@ export const StudentTable = ({ students }: StudentTableProps) => {
           <div className="h-4 min-w-full"></div>
         </div>
       </div>
+
+      <AlertDialog open={!!studentToDelete} onOpenChange={() => setStudentToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this student?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action will remove {studentToDelete?.name} from the class. You can use the rollback button to undo this action.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => studentToDelete && handleDelete(studentToDelete)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

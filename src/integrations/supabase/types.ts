@@ -237,6 +237,44 @@ export type Database = {
           },
         ]
       }
+      student_deletions: {
+        Row: {
+          batch_id: string
+          deleted_at: string | null
+          id: string
+          status: string | null
+          student_data: Json
+          student_id: string
+          user_id: string | null
+        }
+        Insert: {
+          batch_id: string
+          deleted_at?: string | null
+          id?: string
+          status?: string | null
+          student_data: Json
+          student_id: string
+          user_id?: string | null
+        }
+        Update: {
+          batch_id?: string
+          deleted_at?: string | null
+          id?: string
+          status?: string | null
+          student_data?: Json
+          student_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_student_deletions_batch"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "data_sync_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       students: {
         Row: {
           _id: string
