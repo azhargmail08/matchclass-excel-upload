@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,11 +24,13 @@ const Class = () => {
 
   const fetchClassDetails = async () => {
     try {
+      if (!className) return;
+
       // First fetch the class details
       const { data: classData, error: classError } = await supabase
         .from('classes')
         .select('*')
-        .eq('name', className)
+        .eq('name', decodeURIComponent(className))
         .maybeSingle();
 
       if (classError) throw classError;
@@ -41,7 +44,7 @@ const Class = () => {
       const { data: studentsData, error: studentsError } = await supabase
         .from('internal_database')
         .select('*')
-        .eq('Class', className);
+        .eq('Class', decodeURIComponent(className));
 
       if (studentsError) throw studentsError;
 
@@ -63,7 +66,7 @@ const Class = () => {
       }));
 
       setSelectedClass({
-        className: className || '',
+        className: classData.name,
         teacher: classData?.teacher || 'Unassigned',
         students: formattedStudents
       });
@@ -110,7 +113,7 @@ const Class = () => {
           </Button>
           <Alert>
             <AlertDescription>
-              Class "{className}" was not found in the database.
+              Class "{decodeURIComponent(className)}" was not found in the database.
             </AlertDescription>
           </Alert>
         </div>
