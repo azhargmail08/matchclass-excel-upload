@@ -108,7 +108,15 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (deletionError) throw deletionError;
 
-      // Delete from students table
+      // First, delete any related records in data_sync_records
+      const { error: syncRecordsError } = await supabase
+        .from('data_sync_records')
+        .delete()
+        .eq('student_id', student._id);
+
+      if (syncRecordsError) throw syncRecordsError;
+
+      // Then delete from students table
       const { error: deleteError } = await supabase
         .from('students')
         .delete()
