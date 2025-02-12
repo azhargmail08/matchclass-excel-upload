@@ -31,7 +31,7 @@ export const ComparisonResult = ({
             <div className="bg-gray-50 p-3 rounded">
               <div className="flex items-start space-x-2">
                 <Checkbox
-                  checked={isSelected}
+                  checked={isSelected || selectedMatch !== undefined}
                   onCheckedChange={(checked) => onRowSelect(checked as boolean)}
                 />
                 <div className="flex-1">
@@ -52,8 +52,10 @@ export const ComparisonResult = ({
                       onCheckedChange={(checked) => {
                         if (checked) {
                           onMatchSelect(match);
+                          onRowSelect(true);
                         } else {
                           onMatchSelect(undefined);
+                          onRowSelect(false);
                         }
                       }}
                     />
@@ -66,6 +68,7 @@ export const ComparisonResult = ({
                       onValueChange={(value) => {
                         const updatedMatch = { ...match, class: value };
                         onMatchSelect(updatedMatch);
+                        onRowSelect(true);
                       }}
                     >
                       <SelectTrigger className="w-[140px]">

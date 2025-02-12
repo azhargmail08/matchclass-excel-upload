@@ -28,7 +28,17 @@ export const UnmatchedEntries = ({
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Assign New Students</h3>
         <div className="mb-4">
-          <Select value={selectedClass} onValueChange={setSelectedClass}>
+          <Select value={selectedClass} onValueChange={(value) => {
+            setSelectedClass(value);
+            // When a class is selected, automatically check all entries
+            entries.forEach((_, index) => {
+              const globalIndex = entries.findIndex(e => 
+                e.excelEntry.name === entries[index].excelEntry.name && 
+                e.excelEntry.class === entries[index].excelEntry.class
+              );
+              onRowSelect(globalIndex, true);
+            });
+          }}>
             <SelectTrigger>
               <SelectValue placeholder="Select target class" />
             </SelectTrigger>
