@@ -1,4 +1,3 @@
-
 import { Student } from "@/types";
 import { useState } from "react";
 import { Info } from "lucide-react";
@@ -7,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { StudentTableHeader } from "./table/StudentTableHeader";
 import { StudentTableRow } from "./table/StudentTableRow";
 import { DeleteConfirmDialog } from "./table/DeleteConfirmDialog";
+import { TransferClassDialog } from "./table/TransferClassDialog";
 
 interface StudentTableProps {
   students: Student[];
@@ -17,7 +17,11 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingStudents, setEditingStudents] = useState<{ [key: string]: Student }>({});
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [studentToTransfer, setStudentToTransfer] = useState<Student | null>(null);
   const { toast } = useToast();
+
+  // Get unique class names from all students
+  const uniqueClasses = Array.from(new Set(students.map(s => s.class))).sort();
 
   const handleInputChange = (studentId: string, field: keyof Student, value: string) => {
     setEditingStudents(prev => ({
@@ -273,6 +277,7 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
                       onInputChange={(field, value) => handleInputChange(student._id, field, value)}
                       onUpdate={() => handleUpdate(student._id)}
                       onDelete={() => setStudentToDelete(student)}
+                      onTransfer={() => setStudentToTransfer(student)}
                     />
                   ))
               )}
@@ -288,6 +293,13 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
         student={studentToDelete}
         onClose={() => setStudentToDelete(null)}
         onConfirm={handleDelete}
+      />
+
+      <TransferClassDialog
+        student={studentToTransfer}
+        availableClasses={uniqueClasses}
+        onClose={() => setStudentToTransfer(null)}
+        onTransfer={onRefresh || (() => {})}
       />
     </div>
   );

@@ -2,7 +2,7 @@
 import { Student } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, Trash2 } from "lucide-react";
+import { Eye, Trash2, ArrowRightLeft } from "lucide-react";
 
 interface StudentTableRowProps {
   student: Student;
@@ -11,6 +11,7 @@ interface StudentTableRowProps {
   onInputChange: (field: keyof Student, value: string) => void;
   onUpdate: () => void;
   onDelete: () => void;
+  onTransfer: () => void;
 }
 
 export const StudentTableRow = ({
@@ -19,7 +20,8 @@ export const StudentTableRow = ({
   editingStudent,
   onInputChange,
   onUpdate,
-  onDelete
+  onDelete,
+  onTransfer
 }: StudentTableRowProps) => {
   const currentStudent = editingStudent || student;
 
@@ -100,6 +102,15 @@ export const StudentTableRow = ({
               Update
             </Button>
           )}
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={onTransfer}
+            className="h-8 w-8 text-blue-500 hover:text-blue-600"
+            title="Transfer to Another Class"
+          >
+            <ArrowRightLeft className="h-4 w-4" />
+          </Button>
           <Button
             size="icon"
             variant="ghost"
