@@ -13,6 +13,7 @@ interface ComparisonResultsListProps {
   selectedRows: {[key: string]: boolean};
   onMatchSelect: (index: number, student: Student | undefined) => void;
   onRowSelect: (index: number, checked: boolean) => void;
+  setSelectedRows: React.Dispatch<React.SetStateAction<{[key: string]: boolean}>>;
 }
 
 export const ComparisonResultsList = ({
@@ -20,6 +21,7 @@ export const ComparisonResultsList = ({
   selectedRows,
   onMatchSelect,
   onRowSelect,
+  setSelectedRows,
 }: ComparisonResultsListProps) => {
   // Group results by class
   const groupedResults = results.reduce<{
@@ -94,6 +96,7 @@ export const ComparisonResultsList = ({
               entries={unmatchedEntries}
               selectedRows={selectedRows}
               onRowSelect={onRowSelect}
+              setSelectedRows={setSelectedRows}
             />
           </div>
         </div>

@@ -13,12 +13,14 @@ interface UnmatchedEntriesProps {
   }>;
   selectedRows: {[key: string]: boolean};
   onRowSelect: (index: number, checked: boolean) => void;
+  setSelectedRows: React.Dispatch<React.SetStateAction<{[key: string]: boolean}>>;
 }
 
 export const UnmatchedEntries = ({
   entries,
   selectedRows,
   onRowSelect,
+  setSelectedRows,
 }: UnmatchedEntriesProps) => {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const availableClasses = useAvailableClasses();
