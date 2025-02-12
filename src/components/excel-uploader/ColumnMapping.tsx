@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { ColumnMapping as ColumnMappingType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ColumnMappingProps {
   open: boolean;
@@ -25,6 +26,22 @@ interface ColumnMappingProps {
   onColumnMappingChange: (mapping: ColumnMappingType) => void;
   onConfirm: () => void;
 }
+
+const REQUIRED_FIELDS = ['name', 'class'];
+const OPTIONAL_FIELDS = [
+  'nickname',
+  'special_name',
+  'matrix_number',
+  'date_joined',
+  'father_name',
+  'father_id',
+  'father_email',
+  'mother_name',
+  'mother_id',
+  'mother_email',
+  'contact_no',
+  'teacher'
+];
 
 export const ColumnMapping = ({
   open,
@@ -48,58 +65,56 @@ export const ColumnMapping = ({
     onConfirm();
   };
 
+  const renderFieldMapping = (field: string, required: boolean = false) => (
+    <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4 py-2">
+      <label className="text-sm sm:text-right capitalize">
+        {field.replace(/_/g, ' ')}:
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+      <div className="col-span-1 sm:col-span-3">
+        <Select
+          value={columnMapping[field as keyof ColumnMappingType] || ''}
+          onValueChange={(value) =>
+            onColumnMappingChange({
+              ...columnMapping,
+              [field]: value
+            })
+          }
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={`Select ${field.replace(/_/g, ' ')} column`} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">None</SelectItem>
+            {availableColumns.map((column) => (
+              <SelectItem key={column} value={column}>
+                {column}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="h-[80vh] max-h-[80vh] overflow-y-auto w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[60%]">
+      <DialogContent className="h-[80vh] max-h-[80vh] w-full max-w-[90%] sm:max-w-[80%] md:max-w-[70%] lg:max-w-[60%]">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl text-center">Map Excel Columns</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <label className="text-sm sm:text-right">Name Column:</label>
-            <div className="col-span-1 sm:col-span-3">
-              <Select
-                value={columnMapping.name}
-                onValueChange={(value) =>
-                  onColumnMappingChange({ ...columnMapping, name: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select name column" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableColumns.map((column) => (
-                    <SelectItem key={column} value={column}>
-                      {column}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+        <ScrollArea className="flex-grow pr-4">
+          <div className="space-y-2">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Required Fields</h3>
+              {REQUIRED_FIELDS.map((field) => renderFieldMapping(field, true))}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Optional Fields</h3>
+              {OPTIONAL_FIELDS.map((field) => renderFieldMapping(field))}
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4">
-            <label className="text-sm sm:text-right">Class Column:</label>
-            <div className="col-span-1 sm:col-span-3">
-              <Select
-                value={columnMapping.class}
-                onValueChange={(value) =>
-                  onColumnMappingChange({ ...columnMapping, class: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select class column" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableColumns.map((column) => (
-                    <SelectItem key={column} value={column}>
-                      {column}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
+        </ScrollArea>
         <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
             Cancel
