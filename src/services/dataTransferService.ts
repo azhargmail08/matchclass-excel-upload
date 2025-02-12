@@ -44,10 +44,6 @@ export const transferDataToInternal = async (
         }
 
         // If there's no duplicate, proceed with insertion
-        const fatherId = selectedMatch.father_id ? parseInt(selectedMatch.father_id) : null;
-        const motherId = selectedMatch.mother_id ? parseInt(selectedMatch.mother_id) : null;
-        const contactNo = selectedMatch.contact_no ? parseInt(selectedMatch.contact_no) : null;
-
         const { error: insertError } = await supabase
           .from('internal_database')
           .insert({
@@ -59,12 +55,12 @@ export const transferDataToInternal = async (
             "Matrix Number": selectedMatch.matrix_number || '-',
             "Date Joined": selectedMatch.date_joined || '-',
             Father: selectedMatch.father_name || '-',
-            "Father ID": fatherId,
+            "Father ID": selectedMatch.father_id || '-',
             "Father Email": selectedMatch.father_email || '-',
             Mother: selectedMatch.mother_name || '-',
-            "Mother ID": motherId,
+            "Mother ID": selectedMatch.mother_id || '-',
             "Mother Email": selectedMatch.mother_email || '-',
-            "Contact No": contactNo
+            "Contact No": selectedMatch.contact_no || '-'
           });
 
         if (insertError) throw insertError;
@@ -111,12 +107,12 @@ export const transferDataToInternal = async (
             "Matrix Number": excelRow.matrix_number || '-',
             "Date Joined": excelRow.date_joined || '-',
             Father: excelRow.father_name || '-',
-            "Father ID": excelRow.father_id ? parseInt(excelRow.father_id) : null,
+            "Father ID": excelRow.father_id || '-',
             "Father Email": excelRow.father_email || '-',
             Mother: excelRow.mother_name || '-',
-            "Mother ID": excelRow.mother_id ? parseInt(excelRow.mother_id) : null,
+            "Mother ID": excelRow.mother_id || '-',
             "Mother Email": excelRow.mother_email || '-',
-            "Contact No": excelRow.contact_no ? parseInt(excelRow.contact_no) : null
+            "Contact No": excelRow.contact_no || '-'
           });
 
         if (insertError) throw insertError;

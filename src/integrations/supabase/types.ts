@@ -163,15 +163,15 @@ export type Database = {
         Row: {
           _id: string
           Class: string
-          "Contact No": number | null
+          "Contact No": string | null
           "Date Joined": string | null
           Father: string | null
           "Father Email": string | null
           "Father ID": string | null
-          "Matrix Number": number | null
+          "Matrix Number": string | null
           Mother: string | null
           "Mother Email": string | null
-          "Mother ID": number | null
+          "Mother ID": string | null
           Name: string
           Nickname: string | null
           "Special Name": string | null
@@ -179,15 +179,15 @@ export type Database = {
         Insert: {
           _id: string
           Class: string
-          "Contact No"?: number | null
+          "Contact No"?: string | null
           "Date Joined"?: string | null
           Father?: string | null
           "Father Email"?: string | null
           "Father ID"?: string | null
-          "Matrix Number"?: number | null
+          "Matrix Number"?: string | null
           Mother?: string | null
           "Mother Email"?: string | null
-          "Mother ID"?: number | null
+          "Mother ID"?: string | null
           Name: string
           Nickname?: string | null
           "Special Name"?: string | null
@@ -195,15 +195,15 @@ export type Database = {
         Update: {
           _id?: string
           Class?: string
-          "Contact No"?: number | null
+          "Contact No"?: string | null
           "Date Joined"?: string | null
           Father?: string | null
           "Father Email"?: string | null
           "Father ID"?: string | null
-          "Matrix Number"?: number | null
+          "Matrix Number"?: string | null
           Mother?: string | null
           "Mother Email"?: string | null
-          "Mother ID"?: number | null
+          "Mother ID"?: string | null
           Name?: string
           Nickname?: string | null
           "Special Name"?: string | null
@@ -214,15 +214,15 @@ export type Database = {
         Row: {
           _id: string
           Class: string | null
-          "Contact No": number | null
+          "Contact No": string | null
           "Date Joined": string | null
           Father: string | null
           "Father Email": string | null
-          "Father ID": number | null
+          "Father ID": string | null
           "Matrix Number": string | null
           Mother: string | null
           "Mother Email": string | null
-          "Mother ID": number | null
+          "Mother ID": string | null
           Name: string
           Nickname: string | null
           "Special Name": string | null
@@ -230,15 +230,15 @@ export type Database = {
         Insert: {
           _id: string
           Class?: string | null
-          "Contact No"?: number | null
+          "Contact No"?: string | null
           "Date Joined"?: string | null
           Father?: string | null
           "Father Email"?: string | null
-          "Father ID"?: number | null
+          "Father ID"?: string | null
           "Matrix Number"?: string | null
           Mother?: string | null
           "Mother Email"?: string | null
-          "Mother ID"?: number | null
+          "Mother ID"?: string | null
           Name: string
           Nickname?: string | null
           "Special Name"?: string | null
@@ -246,15 +246,15 @@ export type Database = {
         Update: {
           _id?: string
           Class?: string | null
-          "Contact No"?: number | null
+          "Contact No"?: string | null
           "Date Joined"?: string | null
           Father?: string | null
           "Father Email"?: string | null
-          "Father ID"?: number | null
+          "Father ID"?: string | null
           "Matrix Number"?: string | null
           Mother?: string | null
           "Mother Email"?: string | null
-          "Mother ID"?: number | null
+          "Mother ID"?: string | null
           Name?: string
           Nickname?: string | null
           "Special Name"?: string | null
