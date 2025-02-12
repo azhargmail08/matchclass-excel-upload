@@ -40,3 +40,24 @@ export const validateProcessedData = (data: ExcelRow[]): boolean => {
     row.class !== ""
   );
 };
+
+// New function to normalize column names
+export const normalizeColumnName = (column: string): string => {
+  return column
+    .toLowerCase()
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .replace(/[^a-z0-9_]/g, ''); // Remove any characters that aren't letters, numbers, or underscores
+};
+
+// Map Excel columns to our internal field names
+export const columnMappingGuide: { [key: string]: string } = {
+  'date_joined': 'date_joined',
+  'father': 'father_name',
+  'father_id': 'father_id',
+  'father_email': 'father_email',
+  'mother': 'mother_name',
+  'mother_id': 'mother_id',
+  'mother_email': 'mother_email',
+  'contact_no': 'contact_no',
+  'class': 'class',
+};
