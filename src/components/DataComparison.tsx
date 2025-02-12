@@ -107,49 +107,52 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       if (batchError) throw batchError;
 
       for (const result of selectedResults) {
-        // First, insert or update the student record
-        const updateData = {
-          name: result.excelEntry.name,
-          class: result.excelEntry.class,
-          ...(result.selectedMatch ? { _id: result.selectedMatch._id } : { _id: crypto.randomUUID() })
-        };
-
         let studentId;
         
         if (result.selectedMatch) {
           // Update existing student
           const { error: updateError } = await supabase
             .from('students')
-            .update(updateData)
+            .update({
+              name: result.excelEntry.name,
+              class: result.excelEntry.class,
+            })
             .eq('_id', result.selectedMatch._id);
           
           if (updateError) throw updateError;
           studentId = result.selectedMatch._id;
         } else {
           // Insert new student
+          const newStudentId = crypto.randomUUID();
           const { data: newStudent, error: insertError } = await supabase
             .from('students')
-            .insert(updateData)
+            .insert({
+              _id: newStudentId,
+              name: result.excelEntry.name,
+              class: result.excelEntry.class,
+            })
             .select()
             .single();
           
           if (insertError) throw insertError;
-          studentId = updateData._id;
+          studentId = newStudentId;
         }
 
-        // Then create the sync record
-        const syncRecord = {
-          batch_id: batchData.id,
-          student_id: studentId,
-          external_student_id: result.selectedMatch?._id || null,
-          status: 'pending'
-        };
+        // Only create sync record after confirming student exists
+        if (studentId) {
+          const syncRecord = {
+            batch_id: batchData.id,
+            student_id: studentId,
+            external_student_id: result.selectedMatch?._id || null,
+            status: 'pending'
+          };
 
-        const { error: syncError } = await supabase
-          .from('data_sync_records')
-          .insert(syncRecord);
+          const { error: syncError } = await supabase
+            .from('data_sync_records')
+            .insert(syncRecord);
 
-        if (syncError) throw syncError;
+          if (syncError) throw syncError;
+        }
       }
 
       toast({
