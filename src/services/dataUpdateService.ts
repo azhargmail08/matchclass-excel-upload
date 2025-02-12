@@ -7,9 +7,6 @@ interface UpdateResult {
   error?: Error;
 }
 
-// Helper function to wait for a specified time
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const updateSelectedRecords = async (
   selectedResults: Array<{
     excelEntry: ExcelRow;
@@ -76,69 +73,29 @@ export const updateSelectedRecords = async (
           // Create new student with a UUID
           const newStudentId = crypto.randomUUID();
           
-          // Insert new student first
-          const { error: insertError } = await supabase
-            .from('students')
-            .insert({
-              _id: newStudentId,
-              name: result.excelEntry.name,
-              class: result.excelEntry.class,
-              nickname: result.excelEntry.nickname,
-              special_name: result.excelEntry.special_name,
-              matrix_number: result.excelEntry.matrix_number,
-              date_joined: result.excelEntry.date_joined,
-              father_name: result.excelEntry.father_name,
-              father_id: result.excelEntry.father_id,
-              father_email: result.excelEntry.father_email,
-              mother_name: result.excelEntry.mother_name,
-              mother_id: result.excelEntry.mother_id,
-              mother_email: result.excelEntry.mother_email,
-              contact_no: result.excelEntry.contact_no,
-              teacher: result.excelEntry.teacher
-            });
+          // Create both student and sync record in the same transaction
+          const { data: student, error: insertError } = await supabase.rpc('create_student_with_sync_record', {
+            p_student_id: newStudentId,
+            p_name: result.excelEntry.name,
+            p_class: result.excelEntry.class,
+            p_nickname: result.excelEntry.nickname,
+            p_special_name: result.excelEntry.special_name,
+            p_matrix_number: result.excelEntry.matrix_number,
+            p_date_joined: result.excelEntry.date_joined,
+            p_father_name: result.excelEntry.father_name,
+            p_father_id: result.excelEntry.father_id,
+            p_father_email: result.excelEntry.father_email,
+            p_mother_name: result.excelEntry.mother_name,
+            p_mother_id: result.excelEntry.mother_id,
+            p_mother_email: result.excelEntry.mother_email,
+            p_contact_no: result.excelEntry.contact_no,
+            p_teacher: result.excelEntry.teacher,
+            p_batch_id: batchData.id
+          });
 
           if (insertError) {
-            console.error('Error inserting new student:', insertError);
+            console.error('Error creating student with sync record:', insertError);
             throw insertError;
-          }
-
-          // Add a delay to ensure database consistency
-          await delay(1000);
-
-          // Retry verification up to 3 times
-          let verifyStudent = null;
-          let verifyError = null;
-          for (let i = 0; i < 3; i++) {
-            const result = await supabase
-              .from('students')
-              .select()
-              .eq('_id', newStudentId)
-              .single();
-            
-            if (!result.error && result.data) {
-              verifyStudent = result.data;
-              break;
-            }
-            verifyError = result.error;
-            await delay(1000); // Wait before retrying
-          }
-
-          if (!verifyStudent) {
-            throw new Error(`Failed to verify student creation: ${verifyError?.message}`);
-          }
-
-          // Then create sync record after verifying student exists
-          const { error: syncError } = await supabase
-            .from('data_sync_records')
-            .insert({
-              batch_id: batchData.id,
-              student_id: newStudentId,
-              status: 'pending'
-            });
-
-          if (syncError) {
-            console.error('Error creating sync record:', syncError);
-            throw syncError;
           }
         }
       } catch (recordError) {
