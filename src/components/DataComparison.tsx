@@ -1,3 +1,4 @@
+
 import { ExcelRow } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       if (result.success) {
         toast({
           title: "Success",
-          description: "Selected students have been updated",
+          description: `Success, ${selectedResults.length} students transferred`,
         });
         setSelectedRows({});
         if (onUpdateComplete) {
@@ -83,9 +84,10 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
           />
         </div>
         <div className="p-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex justify-end">
+          <div className="flex flex-col items-end space-y-2">
+            <p className="text-sm text-gray-600">Transfer now</p>
             <Button onClick={handleUpdate}>
-              Update
+              Confirm
             </Button>
           </div>
         </div>
