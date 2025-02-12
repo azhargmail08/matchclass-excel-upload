@@ -75,6 +75,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
             selectedRows={selectedRows}
             onMatchSelect={handleMatchSelect}
             onRowSelect={handleCheckboxChange}
+            setSelectedRows={setSelectedRows}
           />
         </div>
         <div className="p-4 bg-gray-50 border-t border-gray-200">
