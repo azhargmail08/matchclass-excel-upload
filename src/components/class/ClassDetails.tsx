@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { ClassDetails as ClassDetailsType } from "@/pages/Class";
 import { Button } from "@/components/ui/button";
