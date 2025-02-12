@@ -1,5 +1,5 @@
 import { Student } from "@/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -18,10 +18,34 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
   const [editingStudents, setEditingStudents] = useState<{ [key: string]: Student }>({});
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [studentToTransfer, setStudentToTransfer] = useState<Student | null>(null);
+  const [availableClasses, setAvailableClasses] = useState<string[]>([]);
   const { toast } = useToast();
 
-  // Get unique class names from all students
-  const uniqueClasses = Array.from(new Set(students.map(s => s.class))).sort();
+  // Fetch all available classes from the classes table
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('classes')
+          .select('name')
+          .order('name');
+
+        if (error) throw error;
+
+        const classNames = data.map(c => c.name);
+        setAvailableClasses(classNames);
+      } catch (error) {
+        console.error('Error fetching classes:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load available classes",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchClasses();
+  }, [toast]);
 
   const handleInputChange = (studentId: string, field: keyof Student, value: string) => {
     setEditingStudents(prev => ({
@@ -297,7 +321,7 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       <TransferClassDialog
         student={studentToTransfer}
-        availableClasses={uniqueClasses}
+        availableClasses={availableClasses}
         onClose={() => setStudentToTransfer(null)}
         onTransfer={onRefresh || (() => {})}
       />
