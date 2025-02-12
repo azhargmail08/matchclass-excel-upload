@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Student } from "@/types";
 import { ClassDetailsView } from "@/components/class/ClassDetails";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -26,11 +26,13 @@ const Class = () => {
     try {
       if (!className) return;
 
+      const decodedClassName = decodeURIComponent(className);
+
       // First fetch the class details
       const { data: classData, error: classError } = await supabase
         .from('classes')
         .select('*')
-        .eq('name', decodeURIComponent(className))
+        .eq('name', decodedClassName)
         .maybeSingle();
 
       if (classError) throw classError;
@@ -40,11 +42,11 @@ const Class = () => {
         return;
       }
 
-      // Then fetch students for this class
+      // Then fetch students for this class using properly encoded class name
       const { data: studentsData, error: studentsError } = await supabase
         .from('internal_database')
         .select('*')
-        .eq('Class', decodeURIComponent(className));
+        .eq('Class', decodedClassName);
 
       if (studentsError) throw studentsError;
 
