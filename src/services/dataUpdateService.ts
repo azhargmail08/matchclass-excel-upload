@@ -42,6 +42,18 @@ export const updateSelectedRecords = async (
             .update({
               name: result.excelEntry.name,
               class: result.excelEntry.class,
+              nickname: result.excelEntry.nickname,
+              special_name: result.excelEntry.special_name,
+              matrix_number: result.excelEntry.matrix_number,
+              date_joined: result.excelEntry.date_joined,
+              father_name: result.excelEntry.father_name,
+              father_id: result.excelEntry.father_id,
+              father_email: result.excelEntry.father_email,
+              mother_name: result.excelEntry.mother_name,
+              mother_id: result.excelEntry.mother_id,
+              mother_email: result.excelEntry.mother_email,
+              contact_no: result.excelEntry.contact_no,
+              teacher: result.excelEntry.teacher
             })
             .eq('_id', result.selectedMatch._id);
           
@@ -61,27 +73,33 @@ export const updateSelectedRecords = async (
           // Create new student with a UUID
           const newStudentId = crypto.randomUUID();
           
-          // Insert new student
-          const { data: newStudent, error: insertError } = await supabase
+          // Insert new student first
+          const { error: insertError } = await supabase
             .from('students')
             .insert({
               _id: newStudentId,
               name: result.excelEntry.name,
               class: result.excelEntry.class,
-            })
-            .select()
-            .single();
+              nickname: result.excelEntry.nickname,
+              special_name: result.excelEntry.special_name,
+              matrix_number: result.excelEntry.matrix_number,
+              date_joined: result.excelEntry.date_joined,
+              father_name: result.excelEntry.father_name,
+              father_id: result.excelEntry.father_id,
+              father_email: result.excelEntry.father_email,
+              mother_name: result.excelEntry.mother_name,
+              mother_id: result.excelEntry.mother_id,
+              mother_email: result.excelEntry.mother_email,
+              contact_no: result.excelEntry.contact_no,
+              teacher: result.excelEntry.teacher
+            });
 
           if (insertError) {
             console.error('Error inserting new student:', insertError);
             throw insertError;
           }
 
-          if (!newStudent) {
-            throw new Error('Failed to create new student');
-          }
-
-          // Create sync record for new student
+          // Then create sync record after student is created
           const { error: syncError } = await supabase
             .from('data_sync_records')
             .insert({
