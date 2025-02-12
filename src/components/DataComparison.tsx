@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { findSimilarNames } from "@/utils/nameMatching";
@@ -106,23 +107,40 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       if (batchError) throw batchError;
 
       for (const result of selectedResults) {
-        const updateData = result.selectedMatch ? {
-          class: result.selectedMatch.class
-        } : {
+        // First, insert or update the student record
+        const updateData = {
           name: result.excelEntry.name,
-          class: result.excelEntry.class
+          class: result.excelEntry.class,
+          ...(result.selectedMatch ? { _id: result.selectedMatch._id } : { _id: crypto.randomUUID() })
         };
 
-        const query = result.selectedMatch 
-          ? supabase.from('students').update(updateData).eq('_id', result.selectedMatch._id)
-          : supabase.from('students').update(updateData).eq('name', result.excelEntry.name);
+        let studentId;
+        
+        if (result.selectedMatch) {
+          // Update existing student
+          const { error: updateError } = await supabase
+            .from('students')
+            .update(updateData)
+            .eq('_id', result.selectedMatch._id);
+          
+          if (updateError) throw updateError;
+          studentId = result.selectedMatch._id;
+        } else {
+          // Insert new student
+          const { data: newStudent, error: insertError } = await supabase
+            .from('students')
+            .insert(updateData)
+            .select()
+            .single();
+          
+          if (insertError) throw insertError;
+          studentId = updateData._id;
+        }
 
-        const { error: updateError } = await query;
-        if (updateError) throw updateError;
-
+        // Then create the sync record
         const syncRecord = {
           batch_id: batchData.id,
-          student_id: result.selectedMatch?._id || null,
+          student_id: studentId,
           external_student_id: result.selectedMatch?._id || null,
           status: 'pending'
         };
