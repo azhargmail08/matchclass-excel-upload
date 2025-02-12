@@ -49,7 +49,7 @@ export const ComparisonResult = ({
         </div>
         <div className="flex-1">
           <div className="space-y-2">
-            <h3 className="font-medium text-gray-700">Possible Matches:</h3>
+            <h3 className="font-medium text-gray-700">SSDM:</h3>
             <div className="bg-gray-50 p-3 rounded space-y-3">
               {matches.length > 0 ? (
                 matches.map((match) => (
