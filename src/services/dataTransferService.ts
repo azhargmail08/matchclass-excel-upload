@@ -66,10 +66,12 @@ export const transferDataToInternal = async (
         if (transferError) throw transferError;
       } else {
         // If no match selected, use Excel data directly
+        const newId = crypto.randomUUID(); // Generate a single UUID for both tables
+
         const { error: insertError } = await supabase
           .from('internal_database')
           .insert({
-            _id: crypto.randomUUID(), // Generate a new UUID for Excel data
+            _id: newId, // Use the same newId
             Name: excelRow.name || '-',
             Class: excelRow.class || '-',
             Nickname: excelRow.nickname || '-',
@@ -87,12 +89,12 @@ export const transferDataToInternal = async (
 
         if (insertError) throw insertError;
 
-        // Record the transfer with generated ID
+        // Record the transfer with the same generated ID
         const { error: transferError } = await supabase
           .from('data_transfers')
           .insert({
             external_id: 'excel-import',
-            internal_id: crypto.randomUUID(),
+            internal_id: newId, // Use the same newId
             user_id: session.session.user.id,
             batch_id: batchData.id,
             status: 'pending'
