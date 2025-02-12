@@ -86,7 +86,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         <div className="p-4 bg-gray-50 border-t border-gray-200">
           <div className="flex justify-end">
             <Button onClick={handleUpdate}>
-              Transfer Selected
+              Update
             </Button>
           </div>
         </div>
