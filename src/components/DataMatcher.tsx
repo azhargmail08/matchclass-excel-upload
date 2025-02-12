@@ -62,7 +62,9 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
           title: "Success",
           description: "Data has been transferred successfully",
         });
-        onConfirm(selectedMatchesToUpdate);
+        // Pass the complete MatchResult objects for the selected indices
+        const selectedMatchResults = selectedIndices.map(index => selectedMatches[index]);
+        onConfirm(selectedMatchResults);
       } else {
         throw result.error;
       }
