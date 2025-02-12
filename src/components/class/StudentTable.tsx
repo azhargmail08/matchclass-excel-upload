@@ -7,6 +7,7 @@ import { Eye, Info, Trash2, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import type { Json } from "@/integrations/supabase/types";
 import {
   AlertDialog,
   AlertDialogAction,
