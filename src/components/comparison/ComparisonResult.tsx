@@ -50,13 +50,7 @@ export const ComparisonResult = ({
                     <Checkbox
                       checked={selectedMatch?._id === match._id}
                       onCheckedChange={(checked) => {
-                        if (checked) {
-                          onMatchSelect(match);
-                          onRowSelect(true);
-                        } else {
-                          onMatchSelect(undefined);
-                          onRowSelect(false);
-                        }
+                        onMatchSelect(checked ? match : undefined);
                       }}
                     />
                     <div className="flex-1">
@@ -64,11 +58,12 @@ export const ComparisonResult = ({
                       <p className="text-xs text-gray-500">SSDM CLASS: {match.class}</p>
                     </div>
                     <Select
-                      value={selectedMatch?._id === match._id ? selectedMatch.class : undefined}
+                      value={selectedMatch?._id === match._id ? selectedMatch.class : match.class}
                       onValueChange={(value) => {
-                        const updatedMatch = { ...match, class: value };
-                        onMatchSelect(updatedMatch);
-                        onRowSelect(true);
+                        if (selectedMatch?._id === match._id) {
+                          const updatedMatch = { ...match, class: value };
+                          onMatchSelect(updatedMatch);
+                        }
                       }}
                     >
                       <SelectTrigger className="w-[140px]">
