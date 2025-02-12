@@ -32,6 +32,12 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
   const handleUpdate = async (studentId: string) => {
     try {
       const updatedStudent = editingStudents[studentId];
+      
+      // Convert string values to numbers where needed
+      const fatherId = updatedStudent.father_id ? parseInt(updatedStudent.father_id) : null;
+      const motherId = updatedStudent.mother_id ? parseInt(updatedStudent.mother_id) : null;
+      const contactNo = updatedStudent.contact_no ? parseInt(updatedStudent.contact_no) : null;
+
       const { error } = await supabase
         .from('internal_database')
         .update({
@@ -42,12 +48,12 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
           "Matrix Number": updatedStudent.matrix_number,
           "Date Joined": updatedStudent.date_joined,
           Father: updatedStudent.father_name,
-          "Father ID": updatedStudent.father_id,
+          "Father ID": fatherId,
           "Father Email": updatedStudent.father_email,
           Mother: updatedStudent.mother_name,
-          "Mother ID": updatedStudent.mother_id,
+          "Mother ID": motherId,
           "Mother Email": updatedStudent.mother_email,
-          "Contact No": updatedStudent.contact_no
+          "Contact No": contactNo
         })
         .eq('_id', studentId);
 
