@@ -23,11 +23,13 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
   } = useDataComparison(excelData);
 
   const handleUpdate = async () => {
-    // Filter selected results based on the unique keys in selectedRows
+    // Get all selected results including both matched and unmatched entries
     const selectedResults = comparisonResults
       .filter((result, index) => {
-        const key = `${result.excelEntry.name}-${result.excelEntry.class}-${index}`;
-        return selectedRows[key];
+        // Check for both regular and unmatched keys
+        const regularKey = `${result.excelEntry.name}-${result.excelEntry.class}-${index}`;
+        const unmatchedKey = `unmatched-${result.excelEntry.name}-${result.excelEntry.class}`;
+        return selectedRows[regularKey] || selectedRows[unmatchedKey];
       })
       .map(result => ({
         excelRow: result.excelEntry,
