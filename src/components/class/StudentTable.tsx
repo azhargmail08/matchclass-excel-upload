@@ -1,23 +1,12 @@
 
 import { Student } from "@/types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { Eye, Info, Trash2, RotateCcw } from "lucide-react";
+import { Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useIsMobile } from "@/hooks/use-mobile";
-import type { Json } from "@/integrations/supabase/types";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { StudentTableHeader } from "./table/StudentTableHeader";
+import { StudentTableRow } from "./table/StudentTableRow";
+import { DeleteConfirmDialog } from "./table/DeleteConfirmDialog";
 
 interface StudentTableProps {
   students: Student[];
@@ -29,7 +18,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
   const [editingStudents, setEditingStudents] = useState<{ [key: string]: Student }>({});
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   const handleInputChange = (studentId: string, field: keyof Student, value: string) => {
     setEditingStudents(prev => ({
@@ -99,7 +87,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
         return;
       }
 
-      // Create a new batch
       const { data: batchData, error: batchError } = await supabase
         .from('data_sync_batches')
         .insert({
@@ -111,19 +98,17 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (batchError) throw batchError;
 
-      // Store the student data before deletion
       const { error: deletionError } = await supabase
         .from('student_deletions')
         .insert({
           student_id: student._id,
-          student_data: student as unknown as Json,
+          student_data: student,
           batch_id: batchData.id,
           user_id: session.session.user.id
         });
 
       if (deletionError) throw deletionError;
 
-      // First, delete any related records in data_sync_records
       const { error: syncRecordsError } = await supabase
         .from('data_sync_records')
         .delete()
@@ -131,7 +116,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (syncRecordsError) throw syncRecordsError;
 
-      // Then delete from internal_database table
       const { error: deleteError } = await supabase
         .from('internal_database')
         .delete()
@@ -161,7 +145,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) return;
 
-      // Get the latest batch for this user
       const { data: latestBatch, error: batchError } = await supabase
         .from('data_sync_batches')
         .select('id')
@@ -172,7 +155,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (batchError) throw batchError;
 
-      // Get deleted students from this batch
       const { data: deletions, error: deletionsError } = await supabase
         .from('student_deletions')
         .select('*')
@@ -181,41 +163,19 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
       if (deletionsError) throw deletionsError;
 
-      // Restore deleted students
       for (const deletion of (deletions || [])) {
-        // Properly type cast the student data
-        const studentData = deletion.student_data as unknown as { 
-          _id: string;
-          name: string;
-          class: string;
-          nickname?: string;
-          special_name?: string;
-          matrix_number?: string;
-          date_joined?: string;
-          father_name?: string;
-          father_id?: string;
-          father_email?: string;
-          mother_name?: string;
-          mother_id?: string;
-          mother_email?: string;
-          contact_no?: string;
-          teacher?: string;
-        };
-
         const { error: restoreError } = await supabase
-          .from('students')
-          .insert(studentData);
+          .from('internal_database')
+          .insert(deletion.student_data);
 
         if (restoreError) throw restoreError;
 
-        // Update deletion status
         await supabase
           .from('student_deletions')
           .update({ status: 'rolled_back' })
           .eq('id', deletion.id);
       }
 
-      // Update batch status
       await supabase
         .from('data_sync_batches')
         .update({ status: 'rolled_back' })
@@ -239,28 +199,11 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
 
   return (
     <div className="space-y-4 w-full">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <Input
-          placeholder="Search Student"
-          className="w-full sm:max-w-sm"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleRollback}
-            className="flex items-center gap-2"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Rollback Changes
-          </Button>
-          <select className="border rounded-lg px-4 py-2 w-full sm:w-auto">
-            <option>Sort A-Z</option>
-            <option>Sort Z-A</option>
-          </select>
-        </div>
-      </div>
+      <StudentTableHeader
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onRollback={handleRollback}
+      />
 
       <div className="relative rounded-lg shadow border bg-white flex flex-col">
         <div className="h-[calc(100vh-300px)] overflow-y-auto">
@@ -297,93 +240,15 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
                     (student.nickname && student.nickname.toLowerCase().includes(searchQuery.toLowerCase()))
                   )
                   .map((student, index) => (
-                    <tr key={student._id}>
-                      <td className="whitespace-nowrap px-4 py-3">{index + 1}</td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          value={editingStudents[student._id]?.name || student.name}
-                          onChange={(e) => handleInputChange(student._id, 'name', e.target.value)}
-                          placeholder="Student Name"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          value={editingStudents[student._id]?.nickname || student.nickname || ''}
-                          onChange={(e) => handleInputChange(student._id, 'nickname', e.target.value)}
-                          maxLength={14}
-                          placeholder="Name On Badges"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          value={editingStudents[student._id]?.special_name || student.special_name || ''}
-                          onChange={(e) => handleInputChange(student._id, 'special_name', e.target.value)}
-                          placeholder="Special Name"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          value={editingStudents[student._id]?.matrix_number || student.matrix_number || ''}
-                          onChange={(e) => handleInputChange(student._id, 'matrix_number', e.target.value)}
-                          placeholder="Matrix Number"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          type="date"
-                          value={editingStudents[student._id]?.date_joined || student.date_joined || ''}
-                          onChange={(e) => handleInputChange(student._id, 'date_joined', e.target.value)}
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          value={editingStudents[student._id]?.father_name || student.father_name || ''}
-                          onChange={(e) => handleInputChange(student._id, 'father_name', e.target.value)}
-                          placeholder="Father's Name"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          value={editingStudents[student._id]?.mother_name || student.mother_name || ''}
-                          onChange={(e) => handleInputChange(student._id, 'mother_name', e.target.value)}
-                          placeholder="Mother's Name"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <Input
-                          value={editingStudents[student._id]?.contact_no || student.contact_no || ''}
-                          onChange={(e) => handleInputChange(student._id, 'contact_no', e.target.value)}
-                          placeholder="Contact Number"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        <div className="flex justify-center gap-2">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8 text-blue-500 hover:text-blue-600"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          {editingStudents[student._id] && (
-                            <Button
-                              onClick={() => handleUpdate(student._id)}
-                              className="h-8 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4"
-                            >
-                              Update
-                            </Button>
-                          )}
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => setStudentToDelete(student)}
-                            className="h-8 w-8 text-red-500 hover:text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
+                    <StudentTableRow
+                      key={student._id}
+                      student={student}
+                      index={index}
+                      editingStudent={editingStudents[student._id]}
+                      onInputChange={(field, value) => handleInputChange(student._id, field, value)}
+                      onUpdate={() => handleUpdate(student._id)}
+                      onDelete={() => setStudentToDelete(student)}
+                    />
                   ))
               )}
             </tbody>
@@ -394,25 +259,11 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
         </div>
       </div>
 
-      <AlertDialog open={!!studentToDelete} onOpenChange={() => setStudentToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this student?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action will remove {studentToDelete?.name} from the class. You can use the rollback button to undo this action.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => studentToDelete && handleDelete(studentToDelete)}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmDialog
+        student={studentToDelete}
+        onClose={() => setStudentToDelete(null)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 };
