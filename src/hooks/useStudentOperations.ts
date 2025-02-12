@@ -18,11 +18,11 @@ export const useStudentOperations = (onRefresh?: () => void) => {
     }));
   };
 
-  const handleUpdate = async (studentId: string, currentStudent: Student) => {
+  const handleUpdate = async (studentId: string) => {
     try {
       const updatedStudent = editingStudents[studentId];
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('internal_database')
         .update({
           Name: updatedStudent.name,
@@ -39,7 +39,9 @@ export const useStudentOperations = (onRefresh?: () => void) => {
           "Mother Email": updatedStudent.mother_email,
           "Contact No": updatedStudent.contact_no
         })
-        .eq('_id', studentId);
+        .eq('_id', studentId)
+        .select()
+        .maybeSingle();
 
       if (error) throw error;
 
