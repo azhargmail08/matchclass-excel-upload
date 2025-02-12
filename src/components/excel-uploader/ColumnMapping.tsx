@@ -43,6 +43,8 @@ const OPTIONAL_FIELDS = [
   'teacher'
 ];
 
+const NONE_VALUE = '__none__';
+
 export const ColumnMapping = ({
   open,
   onOpenChange,
@@ -65,6 +67,18 @@ export const ColumnMapping = ({
     onConfirm();
   };
 
+  const handleValueChange = (field: keyof ColumnMappingType, value: string) => {
+    onColumnMappingChange({
+      ...columnMapping,
+      [field]: value === NONE_VALUE ? '' : value
+    });
+  };
+
+  const getSelectValue = (field: keyof ColumnMappingType) => {
+    const value = columnMapping[field];
+    return value || NONE_VALUE;
+  };
+
   const renderFieldMapping = (field: string, required: boolean = false) => (
     <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-4 py-2">
       <label className="text-sm sm:text-right capitalize">
@@ -73,19 +87,14 @@ export const ColumnMapping = ({
       </label>
       <div className="col-span-1 sm:col-span-3">
         <Select
-          value={columnMapping[field as keyof ColumnMappingType] || ''}
-          onValueChange={(value) =>
-            onColumnMappingChange({
-              ...columnMapping,
-              [field]: value
-            })
-          }
+          value={getSelectValue(field as keyof ColumnMappingType)}
+          onValueChange={(value) => handleValueChange(field as keyof ColumnMappingType, value)}
         >
           <SelectTrigger>
             <SelectValue placeholder={`Select ${field.replace(/_/g, ' ')} column`} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">None</SelectItem>
+            <SelectItem value={NONE_VALUE}>None</SelectItem>
             {availableColumns.map((column) => (
               <SelectItem key={column} value={column}>
                 {column}
