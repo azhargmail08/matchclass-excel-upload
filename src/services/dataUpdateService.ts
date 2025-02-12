@@ -7,6 +7,9 @@ interface UpdateResult {
   error?: Error;
 }
 
+// Helper function to wait for a specified time
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 export const updateSelectedRecords = async (
   selectedResults: Array<{
     excelEntry: ExcelRow;
@@ -99,15 +102,29 @@ export const updateSelectedRecords = async (
             throw insertError;
           }
 
-          // Verify the student was created
-          const { data: verifyStudent, error: verifyError } = await supabase
-            .from('students')
-            .select()
-            .eq('_id', newStudentId)
-            .single();
+          // Add a delay to ensure database consistency
+          await delay(1000);
 
-          if (verifyError || !verifyStudent) {
-            throw new Error('Failed to verify student creation');
+          // Retry verification up to 3 times
+          let verifyStudent = null;
+          let verifyError = null;
+          for (let i = 0; i < 3; i++) {
+            const result = await supabase
+              .from('students')
+              .select()
+              .eq('_id', newStudentId)
+              .single();
+            
+            if (!result.error && result.data) {
+              verifyStudent = result.data;
+              break;
+            }
+            verifyError = result.error;
+            await delay(1000); // Wait before retrying
+          }
+
+          if (!verifyStudent) {
+            throw new Error(`Failed to verify student creation: ${verifyError?.message}`);
           }
 
           // Then create sync record after verifying student exists
