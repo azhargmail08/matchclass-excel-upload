@@ -45,6 +45,7 @@ export const ComparisonResult = ({
                 />
                 <div className="flex-1">
                   <p className="break-words">{excelEntry.name}</p>
+                  <p className="text-sm text-gray-500">{excelEntry.class}</p>
                 </div>
               </div>
             </div>
@@ -75,6 +76,7 @@ export const ComparisonResult = ({
                       />
                       <div className="flex-1">
                         <p className="break-words">{match.name}</p>
+                        <p className="text-sm text-gray-500">{match.class}</p>
                       </div>
                     </div>
                     <Select defaultValue={match.class}>
