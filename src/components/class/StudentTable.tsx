@@ -7,6 +7,7 @@ import { StudentTableHeader } from "./table/StudentTableHeader";
 import { StudentTableRow } from "./table/StudentTableRow";
 import { DeleteConfirmDialog } from "./table/DeleteConfirmDialog";
 import { TransferClassDialog } from "./table/TransferClassDialog";
+import { StudentTableHeaders } from "./table/StudentTableHeaders";
 
 interface StudentTableProps {
   students: Student[];
@@ -263,18 +264,7 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
         <div className="h-[calc(100vh-300px)] overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900">No.</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[200px]">Student Name</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[200px]">Name on Badges</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[150px]">Special Name</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[150px]">Matrix Number</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[150px]">Date Joined</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[200px]">Father's Name</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[200px]">Mother's Name</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 min-w-[150px]">Contact No</th>
-                <th scope="col" className="sticky top-0 z-10 bg-gray-50 px-4 py-3 text-center text-sm font-semibold text-gray-900 min-w-[120px]">Action</th>
-              </tr>
+              <StudentTableHeaders />
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {students.length === 0 ? (
