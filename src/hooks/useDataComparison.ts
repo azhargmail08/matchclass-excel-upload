@@ -51,7 +51,7 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
         console.error('Error comparing data:', error);
         toast({
           title: "Error",
-          description: "Failed to compare data with database",
+          description: "Failed to compare data with external database",
           variant: "destructive",
         });
       }

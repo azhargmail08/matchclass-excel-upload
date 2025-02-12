@@ -121,6 +121,44 @@ export type Database = {
           },
         ]
       }
+      data_transfers: {
+        Row: {
+          batch_id: string | null
+          created_at: string | null
+          external_id: string
+          id: string
+          internal_id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          batch_id?: string | null
+          created_at?: string | null
+          external_id: string
+          id?: string
+          internal_id: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          batch_id?: string | null
+          created_at?: string | null
+          external_id?: string
+          id?: string
+          internal_id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "data_transfers_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "data_sync_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       external_database: {
         Row: {
           _id: string

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ComparisonResultsList } from "./comparison/ComparisonResultsList";
 import { useDataComparison } from "@/hooks/useDataComparison";
-import { updateSelectedRecords } from "@/services/dataUpdateService";
+import { transferDataToInternal } from "@/services/dataTransferService";
 
 interface DataComparisonProps {
   excelData: ExcelRow[];
@@ -30,29 +30,40 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
     if (selectedIndices.length === 0) {
       toast({
         title: "Warning",
-        description: "Please select at least one row to update",
+        description: "Please select at least one record to update",
         variant: "destructive",
       });
       return;
     }
 
     const selectedResults = selectedIndices.map(index => comparisonResults[index]);
-    
-    const result = await updateSelectedRecords(selectedResults);
-    
-    if (result.success) {
-      toast({
-        title: "Success",
-        description: "Selected records have been updated",
-      });
-      setSelectedRows({});
-      if (onUpdateComplete) {
-        onUpdateComplete();
+    const studentsToTransfer = selectedResults
+      .filter(result => result.selectedMatch)
+      .map(result => result.selectedMatch!);
+
+    if (studentsToTransfer.length > 0) {
+      const result = await transferDataToInternal(studentsToTransfer);
+      
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Selected records have been transferred to internal database",
+        });
+        setSelectedRows({});
+        if (onUpdateComplete) {
+          onUpdateComplete();
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: result.error?.message || "Failed to transfer records",
+          variant: "destructive",
+        });
       }
     } else {
       toast({
-        title: "Error",
-        description: result.error?.message || "Failed to update records",
+        title: "Warning",
+        description: "Please select matches for the records you want to transfer",
         variant: "destructive",
       });
     }
@@ -75,7 +86,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         <div className="p-4 bg-gray-50 border-t border-gray-200">
           <div className="flex justify-end">
             <Button onClick={handleUpdate}>
-              Update Selected
+              Transfer Selected
             </Button>
           </div>
         </div>
