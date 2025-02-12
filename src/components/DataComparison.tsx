@@ -95,21 +95,25 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
         return;
       }
 
-      // Create batch first
-      const { data: batchData, error: batchError } = await supabase
-        .from('data_sync_batches')
-        .insert({
-          user_id: session.session.user.id,
-          status: 'pending'
-        })
-        .select()
-        .single();
+      // Start a transaction
+      const { error: beginError } = await supabase.rpc('begin_transaction');
+      if (beginError) throw beginError;
 
-      if (batchError) throw batchError;
+      try {
+        // Create batch
+        const { data: batchData, error: batchError } = await supabase
+          .from('data_sync_batches')
+          .insert({
+            user_id: session.session.user.id,
+            status: 'pending'
+          })
+          .select()
+          .single();
 
-      // Process each result sequentially
-      for (const result of selectedResults) {
-        try {
+        if (batchError) throw batchError;
+
+        // Process each result
+        for (const result of selectedResults) {
           if (result.selectedMatch) {
             // Update existing student
             const { error: updateError } = await supabase
@@ -122,7 +126,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
             
             if (updateError) throw updateError;
 
-            // Create sync record for updated student
+            // Create sync record
             const { error: syncError } = await supabase
               .from('data_sync_records')
               .insert({
@@ -134,9 +138,10 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
 
             if (syncError) throw syncError;
           } else {
-            // Create new student
+            // Create new student with a UUID
             const newStudentId = crypto.randomUUID();
             
+            // Insert new student
             const { error: insertError } = await supabase
               .from('students')
               .insert({
@@ -147,18 +152,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
 
             if (insertError) throw insertError;
 
-            // Verify the student was created
-            const { data: verifyStudent, error: verifyError } = await supabase
-              .from('students')
-              .select()
-              .eq('_id', newStudentId)
-              .single();
-
-            if (verifyError || !verifyStudent) {
-              throw new Error('Failed to verify new student creation');
-            }
-
-            // Create sync record for new student
+            // Create sync record
             const { error: syncError } = await supabase
               .from('data_sync_records')
               .insert({
@@ -170,21 +164,30 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
 
             if (syncError) throw syncError;
           }
-        } catch (error) {
-          console.error('Error processing student:', error);
-          throw error;
         }
-      }
 
-      toast({
-        title: "Success",
-        description: "Selected records have been updated",
-      });
+        // Commit the transaction
+        const { error: commitError } = await supabase.rpc('commit_transaction');
+        if (commitError) throw commitError;
 
-      setSelectedRows({});
-      
-      if (onUpdateComplete) {
-        onUpdateComplete();
+        toast({
+          title: "Success",
+          description: "Selected records have been updated",
+        });
+
+        setSelectedRows({});
+        
+        if (onUpdateComplete) {
+          onUpdateComplete();
+        }
+
+      } catch (error) {
+        // Rollback on any error
+        const { error: rollbackError } = await supabase.rpc('rollback_transaction');
+        if (rollbackError) {
+          console.error('Error rolling back transaction:', rollbackError);
+        }
+        throw error;
       }
 
     } catch (error) {
