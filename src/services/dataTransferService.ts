@@ -25,19 +25,16 @@ export const transferDataToInternal = async (
 
     // Process each student
     for (const student of externalStudents) {
-      // Generate a new UUID for the student
-      const newInternalId = crypto.randomUUID();
-      
       // Convert string IDs to numbers where needed
       const fatherId = student.father_id ? parseInt(student.father_id) : null;
       const motherId = student.mother_id ? parseInt(student.mother_id) : null;
       const contactNo = student.contact_no ? parseInt(student.contact_no) : null;
 
-      // Insert into internal_database
+      // Insert into internal_database with the same _id
       const { error: insertError } = await supabase
         .from('internal_database')
         .insert({
-          _id: newInternalId,
+          _id: student._id,
           Name: student.name,
           Class: student.class,
           Nickname: student.nickname,
@@ -60,7 +57,7 @@ export const transferDataToInternal = async (
         .from('data_transfers')
         .insert({
           external_id: student._id,
-          internal_id: newInternalId,
+          internal_id: student._id, // Use the same ID
           user_id: session.session.user.id,
           batch_id: batchData.id,
           status: 'pending'
