@@ -58,10 +58,17 @@ export const DataMatcher = ({ matches, onConfirm }: DataMatcherProps) => {
       const result = await transferDataToInternal(selectedMatchesToUpdate);
       
       if (result.success) {
-        toast({
-          title: "Success",
-          description: "Data has been transferred successfully",
-        });
+        if (result.skippedRecords && result.skippedRecords > 0) {
+          toast({
+            title: "Partial Success",
+            description: `Data transferred successfully. ${result.skippedRecords} record(s) were skipped because they already exist in the target class.`,
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: "Data has been transferred successfully",
+          });
+        }
         // Pass the complete MatchResult objects for the selected indices
         const selectedMatchResults = selectedIndices.map(index => selectedMatches[index]);
         onConfirm(selectedMatchResults);

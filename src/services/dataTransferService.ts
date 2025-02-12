@@ -4,7 +4,7 @@ import { Student, ExcelRow } from "@/types";
 
 export const transferDataToInternal = async (
   selectedRows: { excelRow: ExcelRow, selectedMatch?: Student | undefined }[]
-): Promise<{ success: boolean; error?: Error }> => {
+): Promise<{ success: boolean; error?: Error; skippedRecords?: number }> => {
   try {
     const { data: session } = await supabase.auth.getSession();
     if (!session.session) {
@@ -23,10 +23,27 @@ export const transferDataToInternal = async (
 
     if (batchError) throw batchError;
 
+    let skippedRecords = 0;
+
     // Process each selected row
     for (const { excelRow, selectedMatch } of selectedRows) {
       if (selectedMatch) {
-        // If there's a selected match from SSDM, use that data
+        // Check if a record with the same name and class already exists
+        const { data: existingRecords, error: checkError } = await supabase
+          .from('internal_database')
+          .select('_id')
+          .eq('Name', selectedMatch.name)
+          .eq('Class', selectedMatch.class);
+
+        if (checkError) throw checkError;
+
+        if (existingRecords && existingRecords.length > 0) {
+          // Skip this record and increment counter
+          skippedRecords++;
+          continue;
+        }
+
+        // If there's no duplicate, proceed with insertion
         const fatherId = selectedMatch.father_id ? parseInt(selectedMatch.father_id) : null;
         const motherId = selectedMatch.mother_id ? parseInt(selectedMatch.mother_id) : null;
         const contactNo = selectedMatch.contact_no ? parseInt(selectedMatch.contact_no) : null;
@@ -65,13 +82,28 @@ export const transferDataToInternal = async (
 
         if (transferError) throw transferError;
       } else {
-        // If no match selected, use Excel data directly
-        const newId = crypto.randomUUID(); // Generate a single UUID for both tables
+        // Check if a record with the same name and class already exists
+        const { data: existingRecords, error: checkError } = await supabase
+          .from('internal_database')
+          .select('_id')
+          .eq('Name', excelRow.name)
+          .eq('Class', excelRow.class);
+
+        if (checkError) throw checkError;
+
+        if (existingRecords && existingRecords.length > 0) {
+          // Skip this record and increment counter
+          skippedRecords++;
+          continue;
+        }
+
+        // If no match selected and no duplicate exists, use Excel data directly
+        const newId = crypto.randomUUID();
 
         const { error: insertError } = await supabase
           .from('internal_database')
           .insert({
-            _id: newId, // Use the same newId
+            _id: newId,
             Name: excelRow.name || '-',
             Class: excelRow.class || '-',
             Nickname: excelRow.nickname || '-',
@@ -94,7 +126,7 @@ export const transferDataToInternal = async (
           .from('data_transfers')
           .insert({
             external_id: 'excel-import',
-            internal_id: newId, // Use the same newId
+            internal_id: newId,
             user_id: session.session.user.id,
             batch_id: batchData.id,
             status: 'pending'
@@ -104,12 +136,16 @@ export const transferDataToInternal = async (
       }
     }
 
-    return { success: true };
+    return { 
+      success: true,
+      skippedRecords 
+    };
   } catch (error) {
     console.error('Error in transferDataToInternal:', error);
     return { 
       success: false, 
-      error: error instanceof Error ? error : new Error('Failed to transfer data') 
+      error: error instanceof Error ? error : new Error('Failed to transfer data'),
+      skippedRecords: 0
     };
   }
 };
