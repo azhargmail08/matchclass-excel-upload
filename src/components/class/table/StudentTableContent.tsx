@@ -8,7 +8,7 @@ interface StudentTableContentProps {
   searchQuery: string;
   editingStudents: { [key: string]: Student };
   onInputChange: (studentId: string, field: keyof Student, value: string) => void;
-  onUpdate: (studentId: string, student: Student) => void;
+  onUpdate: (studentId: string) => void;
   onDelete: (student: Student) => void;
   onTransfer: (student: Student) => void;
 }
@@ -50,7 +50,7 @@ export const StudentTableContent = ({
             index={index}
             editingStudent={editingStudents[student._id]}
             onInputChange={(field, value) => onInputChange(student._id, field, value)}
-            onUpdate={() => onUpdate(student._id, student)}
+            onUpdate={() => onUpdate(student._id)}
             onDelete={() => onDelete(student)}
             onTransfer={() => onTransfer(student)}
           />

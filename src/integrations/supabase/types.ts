@@ -261,54 +261,6 @@ export type Database = {
         }
         Relationships: []
       }
-      pending_class_assignments: {
-        Row: {
-          batch_id: string | null
-          created_at: string | null
-          excel_data: Json
-          id: string
-          status: string | null
-          student_name: string
-          target_class: string | null
-          user_id: string
-        }
-        Insert: {
-          batch_id?: string | null
-          created_at?: string | null
-          excel_data: Json
-          id?: string
-          status?: string | null
-          student_name: string
-          target_class?: string | null
-          user_id: string
-        }
-        Update: {
-          batch_id?: string | null
-          created_at?: string | null
-          excel_data?: Json
-          id?: string
-          status?: string | null
-          student_name?: string
-          target_class?: string | null
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pending_class_assignments_batch_id_fkey"
-            columns: ["batch_id"]
-            isOneToOne: false
-            referencedRelation: "data_sync_batches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pending_class_assignments_target_class_fkey"
-            columns: ["target_class"]
-            isOneToOne: false
-            referencedRelation: "classes"
-            referencedColumns: ["name"]
-          },
-        ]
-      }
       student_changes: {
         Row: {
           batch_id: string

@@ -1,8 +1,6 @@
 
 import { ExcelRow, Student } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAvailableClasses } from "@/hooks/useAvailableClasses";
 
 interface ComparisonResultProps {
   excelEntry: ExcelRow;
@@ -21,8 +19,6 @@ export const ComparisonResult = ({
   onMatchSelect,
   onRowSelect,
 }: ComparisonResultProps) => {
-  const availableClasses = useAvailableClasses();
-
   return (
     <div className="border-b border-gray-200 pb-4">
       <div className="grid grid-cols-2 gap-4">
@@ -31,9 +27,16 @@ export const ComparisonResult = ({
             <div className="bg-gray-50 p-3 rounded">
               <div className="flex items-start space-x-2">
                 <Checkbox
-                  id={`checkbox-${excelEntry.name}-${excelEntry.class}`}
-                  checked={isSelected}
-                  onCheckedChange={(checked) => onRowSelect(checked as boolean)}
+                  checked={isSelected && !selectedMatch}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      onMatchSelect(undefined);
+                      onRowSelect(true);
+                    } else {
+                      onRowSelect(false);
+                    }
+                  }}
+                  disabled={Boolean(selectedMatch)}
                 />
                 <div className="flex-1">
                   <p className="break-words">{excelEntry.name}</p>
@@ -49,34 +52,21 @@ export const ComparisonResult = ({
                 matches.map((match) => (
                   <div key={match._id} className="flex items-start space-x-2">
                     <Checkbox
-                      id={`match-${match._id}`}
                       checked={selectedMatch?._id === match._id}
-                      onCheckedChange={(checked) => onMatchSelect(checked ? match : undefined)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          onMatchSelect(match);
+                          onRowSelect(true);
+                        } else {
+                          onMatchSelect(undefined);
+                          onRowSelect(false);
+                        }
+                      }}
+                      disabled={isSelected && !selectedMatch && selectedMatch?._id !== match._id}
                     />
                     <div className="flex-1">
                       <p className="break-words">{match.name}</p>
-                      <p className="text-xs text-gray-500">SSDM CLASS: {match.class}</p>
                     </div>
-                    <Select
-                      value={selectedMatch?._id === match._id ? selectedMatch.class : match.class}
-                      onValueChange={(value) => {
-                        if (selectedMatch?._id === match._id) {
-                          const updatedMatch = { ...match, class: value };
-                          onMatchSelect(updatedMatch);
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder={match.class} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableClasses.map((className) => (
-                          <SelectItem key={className} value={className}>
-                            {className}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                   </div>
                 ))
               ) : (
@@ -89,4 +79,3 @@ export const ComparisonResult = ({
     </div>
   );
 };
-

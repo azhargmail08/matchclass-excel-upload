@@ -9,10 +9,9 @@ interface ComparisonResultsListProps {
     matches: Array<Student>;
     selectedMatch?: Student;
   }>;
-  selectedRows: {[key: string]: boolean};
+  selectedRows: {[key: number]: boolean};
   onMatchSelect: (index: number, student: Student | undefined) => void;
   onRowSelect: (index: number, checked: boolean) => void;
-  setSelectedRows: React.Dispatch<React.SetStateAction<{[key: string]: boolean}>>;
 }
 
 export const ComparisonResultsList = ({
@@ -20,7 +19,6 @@ export const ComparisonResultsList = ({
   selectedRows,
   onMatchSelect,
   onRowSelect,
-  setSelectedRows,
 }: ComparisonResultsListProps) => {
   // Group results by class
   const groupedResults = results.reduce<{
@@ -33,11 +31,6 @@ export const ComparisonResultsList = ({
     acc[className].push(result);
     return acc;
   }, {});
-
-  const getIsSelected = (result: typeof results[0], index: number) => {
-    const key = `${result.excelEntry.name}-${result.excelEntry.class}-${index}`;
-    return selectedRows[key] || false;
-  };
 
   return (
     <ScrollArea className="h-[60vh] sm:h-[70vh]">
@@ -59,20 +52,18 @@ export const ComparisonResultsList = ({
               </h3>
             </div>
             <div className="space-y-4">
-              {classResults
-                .filter(result => result.matches.length > 0)
-                .map((result, index) => {
+              {classResults.map((result, index) => {
                 const globalIndex = results.findIndex(r => 
                   r.excelEntry.name === result.excelEntry.name && 
                   r.excelEntry.class === result.excelEntry.class
                 );
                 return (
                   <ComparisonResult
-                    key={`${result.excelEntry.name}-${result.excelEntry.class}-${globalIndex}`}
+                    key={globalIndex}
                     excelEntry={result.excelEntry}
                     matches={result.matches}
                     selectedMatch={result.selectedMatch}
-                    isSelected={getIsSelected(result, globalIndex)}
+                    isSelected={selectedRows[globalIndex] || false}
                     onMatchSelect={(student) => onMatchSelect(globalIndex, student)}
                     onRowSelect={(checked) => onRowSelect(globalIndex, checked)}
                   />

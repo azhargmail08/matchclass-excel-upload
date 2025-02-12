@@ -11,7 +11,7 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
     matches: Array<Student>;
     selectedMatch?: Student;
   }>>([]);
-  const [selectedRows, setSelectedRows] = useState<{[key: string]: boolean}>({});
+  const [selectedRows, setSelectedRows] = useState<{[key: number]: boolean}>({});
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,6 +42,7 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
 
         const results = excelData.map((excelEntry, index) => {
           const matches = findSimilarNames(excelEntry.name, formattedStudents);
+          // Find the best match (same name and matching class pattern)
           const bestMatch = matches.find(match => {
             const excelClass = excelEntry.class.match(/\d+/)?.[0];
             const matchClass = match.class.match(/\d+/)?.[0];
@@ -58,7 +59,16 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
         });
 
         setComparisonResults(results);
-        setSelectedRows({});
+        
+        // Initialize selected rows with true for matches
+        const initialSelectedRows = results.reduce((acc, result, index) => {
+          if (result.selectedMatch) {
+            acc[index] = true;
+          }
+          return acc;
+        }, {} as {[key: number]: boolean});
+        
+        setSelectedRows(initialSelectedRows);
       } catch (error) {
         console.error('Error comparing data:', error);
         toast({
@@ -81,11 +91,9 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
   };
 
   const handleCheckboxChange = (index: number, checked: boolean) => {
-    const entry = comparisonResults[index];
-    const key = `${entry.excelEntry.name}-${entry.excelEntry.class}-${index}`;
     setSelectedRows(prev => ({
       ...prev,
-      [key]: checked
+      [index]: checked
     }));
   };
 

@@ -21,24 +21,8 @@ export const useStudentOperations = (onRefresh?: () => void) => {
   const handleUpdate = async (studentId: string, currentStudent: Student) => {
     try {
       const updatedStudent = editingStudents[studentId];
-      if (!updatedStudent) {
-        throw new Error("No changes to update");
-      }
 
-      // First check if the record exists
-      const { data: existingStudent, error: checkError } = await supabase
-        .from('internal_database')
-        .select()
-        .eq('_id', studentId)
-        .maybeSingle();
-
-      if (checkError) throw checkError;
-      if (!existingStudent) {
-        throw new Error("Student record not found");
-      }
-
-      // Then perform the update
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .from('internal_database')
         .update({
           Name: updatedStudent.name,
@@ -57,7 +41,7 @@ export const useStudentOperations = (onRefresh?: () => void) => {
         })
         .eq('_id', studentId);
 
-      if (updateError) throw updateError;
+      if (error) throw error;
 
       toast({
         title: "Success",
@@ -75,7 +59,7 @@ export const useStudentOperations = (onRefresh?: () => void) => {
       console.error('Error updating student:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update student information",
+        description: "Failed to update student information",
         variant: "destructive",
       });
     }

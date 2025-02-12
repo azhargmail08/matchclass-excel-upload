@@ -1,3 +1,4 @@
+
 import { ExcelRow, ColumnMapping } from "@/types";
 
 export const processExcelData = (mapping: ColumnMapping, data: any[]): ExcelRow[] => {
@@ -34,9 +35,13 @@ export const processExcelData = (mapping: ColumnMapping, data: any[]): ExcelRow[
 };
 
 export const validateProcessedData = (data: ExcelRow[]): boolean => {
-  return data.every(row => row.name !== "");
+  return data.every(row => 
+    row.name !== "" && 
+    row.class !== ""
+  );
 };
 
+// New function to normalize column names
 export const normalizeColumnName = (column: string): string => {
   return column
     .toLowerCase()
@@ -44,6 +49,7 @@ export const normalizeColumnName = (column: string): string => {
     .replace(/[^a-z0-9_]/g, ''); // Remove any characters that aren't letters, numbers, or underscores
 };
 
+// Map Excel columns to our internal field names
 export const columnMappingGuide: { [key: string]: string } = {
   'date_joined': 'date_joined',
   'father': 'father_name',

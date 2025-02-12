@@ -23,20 +23,11 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
   } = useDataComparison(excelData);
 
   const handleUpdate = async () => {
-    // Get all selected results including both matched and unmatched entries
-    const selectedResults = comparisonResults
-      .filter((result, index) => {
-        // Check for both regular and unmatched keys
-        const regularKey = `${result.excelEntry.name}-${result.excelEntry.class}-${index}`;
-        const unmatchedKey = `unmatched-${result.excelEntry.name}-${result.excelEntry.class}`;
-        return selectedRows[regularKey] || selectedRows[unmatchedKey];
-      })
-      .map(result => ({
-        excelRow: result.excelEntry,
-        selectedMatch: result.selectedMatch
-      }));
+    const selectedIndices = Object.entries(selectedRows)
+      .filter(([_, checked]) => checked)
+      .map(([index]) => parseInt(index));
 
-    if (selectedResults.length === 0) {
+    if (selectedIndices.length === 0) {
       toast({
         title: "Warning",
         description: "Please select at least one record to update",
@@ -45,21 +36,34 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       return;
     }
 
-    const result = await transferDataToInternal(selectedResults);
+    const selectedResults = selectedIndices.map(index => ({
+      excelRow: comparisonResults[index].excelEntry,
+      selectedMatch: comparisonResults[index].selectedMatch
+    }));
+
+    if (selectedResults.length > 0) {
+      const result = await transferDataToInternal(selectedResults);
       
-    if (result.success) {
-      toast({
-        title: "Success",
-        description: "Selected students have been updated",
-      });
-      setSelectedRows({});
-      if (onUpdateComplete) {
-        onUpdateComplete();
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Selected students have been updated",
+        });
+        setSelectedRows({});
+        if (onUpdateComplete) {
+          onUpdateComplete();
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: result.error?.message || "Failed to transfer records",
+          variant: "destructive",
+        });
       }
     } else {
       toast({
-        title: "Error",
-        description: result.error?.message || "Failed to transfer records",
+        title: "Warning",
+        description: "Please select matches for the records you want to transfer",
         variant: "destructive",
       });
     }
@@ -77,7 +81,6 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
             selectedRows={selectedRows}
             onMatchSelect={handleMatchSelect}
             onRowSelect={handleCheckboxChange}
-            setSelectedRows={setSelectedRows}
           />
         </div>
         <div className="p-4 bg-gray-50 border-t border-gray-200">
