@@ -74,7 +74,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       <Card className="bg-white">
         <div className="p-4 sm:p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Data Comparison Results
+            Select students to transfer class
           </h2>
           <ComparisonResultsList
             results={comparisonResults}
@@ -94,3 +94,4 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
     </div>
   );
 };
+

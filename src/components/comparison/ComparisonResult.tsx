@@ -1,6 +1,7 @@
 
 import { ExcelRow, Student } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowRight } from "lucide-react";
 
 interface ComparisonResultProps {
   excelEntry: ExcelRow;
@@ -41,6 +42,7 @@ export const ComparisonResult = ({
                 <div className="flex-1">
                   <p className="break-words">{excelEntry.name}</p>
                 </div>
+                <ArrowRight className="text-gray-400 mt-1" />
               </div>
             </div>
           </div>
@@ -79,3 +81,4 @@ export const ComparisonResult = ({
     </div>
   );
 };
+
