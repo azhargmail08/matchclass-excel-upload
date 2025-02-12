@@ -257,7 +257,6 @@ export const StudentTable = ({ students, onRefresh }: StudentTableProps) => {
       <StudentTableHeader
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        onRollback={handleRollback}
       />
 
       <div className="relative rounded-lg shadow border bg-white flex flex-col">
