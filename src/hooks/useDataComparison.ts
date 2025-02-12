@@ -42,7 +42,6 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
 
         const results = excelData.map((excelEntry, index) => {
           const matches = findSimilarNames(excelEntry.name, formattedStudents);
-          // Find the best match (same name and matching class pattern)
           const bestMatch = matches.find(match => {
             const excelClass = excelEntry.class.match(/\d+/)?.[0];
             const matchClass = match.class.match(/\d+/)?.[0];
@@ -59,10 +58,7 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
         });
 
         setComparisonResults(results);
-        
-        // Initialize all rows as unselected with a unique key for each row
-        const initialSelectedRows = {};
-        setSelectedRows(initialSelectedRows);
+        setSelectedRows({});
       } catch (error) {
         console.error('Error comparing data:', error);
         toast({
@@ -85,10 +81,8 @@ export const useDataComparison = (excelData: ExcelRow[]) => {
   };
 
   const handleCheckboxChange = (index: number, checked: boolean) => {
-    // Create a unique key using both the index and the entry details
     const entry = comparisonResults[index];
     const key = `${entry.excelEntry.name}-${entry.excelEntry.class}-${index}`;
-    
     setSelectedRows(prev => ({
       ...prev,
       [key]: checked

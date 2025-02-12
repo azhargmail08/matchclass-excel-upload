@@ -42,22 +42,25 @@ export const UnmatchedEntries = ({
           </Select>
         </div>
         <div className="space-y-3">
-          {entries.map((entry, index) => {
-            const globalIndex = entries.findIndex(e => 
-              e.excelEntry.name === entry.excelEntry.name && 
-              e.excelEntry.class === entry.excelEntry.class
-            );
-            const key = `${entry.excelEntry.name}-${entry.excelEntry.class}-${globalIndex}`;
+          {entries.map((entry) => {
+            // Create a unique key for unmatched entries
+            const unmatchedKey = `unmatched-${entry.excelEntry.name}-${entry.excelEntry.class}`;
             return (
-              <div key={globalIndex} className="flex items-start space-x-2 bg-white p-3 rounded">
+              <div key={unmatchedKey} className="flex items-start space-x-2 bg-white p-3 rounded">
                 <Checkbox
-                  checked={selectedRows[key] || false}
-                  onCheckedChange={(checked) => onRowSelect(globalIndex, checked as boolean)}
+                  checked={selectedRows[unmatchedKey] || false}
+                  onCheckedChange={(checked) => {
+                    // Use the unique unmatched key for selection
+                    setSelectedRows(prev => ({
+                      ...prev,
+                      [unmatchedKey]: checked as boolean
+                    }));
+                  }}
                 />
                 <div className="flex-1">
                   <p className="text-sm font-medium">{entry.excelEntry.name}</p>
                   <p className="text-xs text-gray-500">From: {entry.excelEntry.class}</p>
-                  {selectedRows[key] && !selectedClass && (
+                  {selectedRows[unmatchedKey] && !selectedClass && (
                     <p className="text-xs text-amber-600 mt-1">Please select a target class</p>
                   )}
                 </div>
