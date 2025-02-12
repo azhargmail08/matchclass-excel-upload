@@ -47,7 +47,7 @@ export const DataComparison = ({ excelData, onUpdateComplete }: DataComparisonPr
       if (result.success) {
         toast({
           title: "Success",
-          description: "Selected records have been transferred to internal database",
+          description: "Selected students have been updated",
         });
         setSelectedRows({});
         if (onUpdateComplete) {
